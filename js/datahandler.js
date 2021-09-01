@@ -17,9 +17,10 @@
 var array_DatahandlerDivsID = getDOM_Prpperties(document.getElementsByClassName("datahandler-root"), "id");
 
 //on window load:
-function main_datahandler() {
+function main_datahandler(Identification = "ID") {
     for (j = 0; j < array_DatahandlerDivsID.length; j++) {
         var var_DataObject = var_data[array_DatahandlerDivsID[j]];
+        var var_data_flat = flattenData(var_data);
         var var_DatahandlerDiv_innerHTML = document.getElementById(array_DatahandlerDivsID[j]).innerHTML;
         var var_DatahandlerDiv = document.getElementById(array_DatahandlerDivsID[j]);
         var var_DatahandlerDiv_ClassTags = getTagsfromClass(var_DatahandlerDiv.classList);
@@ -86,3 +87,49 @@ function IsThereEqualTag(Taglist1, Taglist2) {
     }
     return false;
 }
+
+function flattenData(dataA = []) {
+    var keys = Object.keys(dataA);
+    var tmp = [];
+    for (let key of keys) {
+        var llist = dataA[key]
+        for (e of llist) {
+            tmp.push(e)
+        }
+     }
+    return tmp;
+}
+
+
+//*******************************************************/
+//TEST                                                  *
+//*******************************************************
+
+function test_flattenData() {
+    var dataA = {
+        "Alpha":
+            [
+                {"stadt": "Munich", "Land": "BY", "Fluss": "Isar",},
+                {"stadt": "Frankfurt", "Land": "HE", "Fluss": "Main",},
+            ],
+        "Beta":
+            [
+                {"stadt": "New York", "Land": "USA", "Fluss": "Hudson",},
+            ],
+    };
+
+    var dataB = [
+                {"stadt": "Munich", "Land": "BY", "Fluss": "Isar",},
+                {"stadt": "Frankfurt", "Land": "HE", "Fluss": "Main",},
+                {"stadt": "New York", "Land": "USA", "Fluss": "Hudson",}
+        ];
+    var dataA_flat = flattenData(dataA);
+
+    if (dataA = dataB) {
+        console.log("test_flattenData() passed")
+    } else {
+        console.log("test_flattenData() failed")
+    }             
+}
+
+test_flattenData();
