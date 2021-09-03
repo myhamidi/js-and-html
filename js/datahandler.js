@@ -14,7 +14,6 @@
 
 //parameters
 var var_data = Object.assign(data01);  // data link
-var datahandlerIDs = getDOM_Prpperties(document.getElementsByClassName("datahandler-root"), "id");
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
 //on window load:
@@ -28,24 +27,43 @@ function main_datahandler(Identification = "ID") {
             }
         if (Identification == "Global") {
             dataSubset = flattenData(var_data)}
-
-        var div_tags = getTagsfromClass(datahandler_divs[j].classList);
         
-        var fragment = '';
-        
-        for (i = 0; i < dataSubset.length; i++) {
-            if (dataSubset[i]["Tags"] == undefined) {continue}
-            if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
-                fragment += ReplaceDatahandlerDivWithData(datahandler_divs[j],dataSubset[i]);}
-        }
-        if (datahandler_divs[j].classList.contains("datahandler-table")) { //not array. DOM token list
-            datahandler_divs[j].innerHTML  = "<table>" + fragment + "</table>"}
+        if (datahandler_divs[j].classList.contains("dh-table")) {
+            main_datahandler_table(j, dataSubset);} 
         else {
-            datahandler_divs[j].innerHTML = fragment;}
+            main_datahandler_main(j, dataSubset);}
+        }
+}
+
+
+function main_datahandler_main(nth_div, dataSubset) {
+    j = nth_div;
+    var div_tags = getTagsfromClass(datahandler_divs[j].classList);
+    var fragment = '';
+    
+    for (i = 0; i < dataSubset.length; i++) {
+        if (dataSubset[i]["Tags"] == undefined) {continue}
+        if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
+            fragment += ReplaceWithData(datahandler_divs[j],dataSubset[i]);}
     }
+    datahandler_divs[j].innerHTML = fragment;
 };
 
-function ReplaceDatahandlerDivWithData (div, data) {
+function main_datahandler_table(nth_div, dataSubset) {
+    j = nth_div;
+    var div_tags = getTagsfromClass(datahandler_divs[j].classList);
+    var fragment = '';
+        
+    for (i = 0; i < dataSubset.length; i++) {
+        if (dataSubset[i]["Tags"] == undefined) {continue}
+        if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
+            fragment += ReplaceWithData_table(datahandler_divs[j],dataSubset[i]);}
+    }
+    datahandler_divs[j].innerHTML  = "<table>" + fragment + "</table>"
+
+};
+
+function ReplaceWithData (div, data) {
     keys = Object.getOwnPropertyNames(data)
     var div_innerHTML = div.innerHTML
     //For each Data Item Key,
@@ -56,9 +74,23 @@ function ReplaceDatahandlerDivWithData (div, data) {
         else { 
         div_innerHTML= div_innerHTML.replace(new RegExp("{{" + keys[k] + "}}", 'g'), data[keys[k]])}
     }
-    if (div.classList.contains("datahandler-table")){
-        return "<tr>" + div_innerHTML + "</tr>"}
-    else {return div_innerHTML}
+    return div_innerHTML;
+}
+
+function ReplaceWithData_table (div, data) {
+    keys = Object.getOwnPropertyNames(data)
+    var div_innerHTML = div.innerHTML
+    var ret = "<table>"
+    //For each Data Item Key,
+    for (k = 0; k < keys.length; k++) {
+        //Replace {{}} statement with corresponding data Property
+        div_innerHTML = div_innerHTML.replace(new RegExp("{{" + keys[k] + "}}", 'g'), data[keys[k]])}
+        div_innerHTML = div_innerHTML.replace(new RegExp("{/col}", 'g'), "</td>")
+        div_innerHTML = div_innerHTML.replace(new RegExp("{col}", 'g'), "<td>")
+        div_innerHTML = div_innerHTML.replace(new RegExp("{/row}", 'g'), "</tr>")
+        div_innerHTML = div_innerHTML.replace(new RegExp("{row}", 'g'), "<tr>")
+ 
+    return div_innerHTML;
 }
 
 function getDOM_Prpperties(DOM_objects, DOM_Property) {
