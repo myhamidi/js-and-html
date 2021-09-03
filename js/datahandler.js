@@ -13,49 +13,40 @@
 
 
 //parameters
-
-var array_DatahandlerDivsID = getDOM_Prpperties(document.getElementsByClassName("datahandler-root"), "id");
+var var_data = Object.assign(data01);  // data link
+var datahandlerIDs = getDOM_Prpperties(document.getElementsByClassName("datahandler-root"), "id");
+var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
 //on window load:
 function main_datahandler(Identification = "ID") {
-    for (j = 0; j < array_DatahandlerDivsID.length; j++) {
+    for (j = 0; j < datahandler_divs.length; j++) {
+        var dataSubset = [];
         if (Identification == "ID") {
-            var var_DataObject = var_data[array_DatahandlerDivsID[j]]}
+            if (Object.keys(var_data).includes(datahandler_divs[j].id)){
+                dataSubset = var_data[datahandler_divs[j].id]}
+            else {continue} // when div id (of class datahandler) was not found in data
+            }
         if (Identification == "Global") {
-            var var_DataObject = flattenData(var_data)}
-        var var_DatahandlerDiv_innerHTML = document.getElementById(array_DatahandlerDivsID[j]).innerHTML;
-        var var_DatahandlerDiv = document.getElementById(array_DatahandlerDivsID[j]);
-        var var_DatahandlerDiv_ClassTags = getTagsfromClass(var_DatahandlerDiv.classList);
+            dataSubset = flattenData(var_data)}
+
+        var div_tags = getTagsfromClass(datahandler_divs[j].classList);
         
-        var var_TagMatchTRUE = true;
         var fragment = '';
         
-        // when Div ID is found in data.js
-        if (var_DataObject!= undefined) {
-            //For each Data Item
-            for (i = 0; i < var_DataObject.length; i++) {
-                //Check for Tags
-                if (!(var_DatahandlerDiv_ClassTags == undefined || var_DatahandlerDiv_ClassTags.length == 0) ) {
-                    var_TagMatchTRUE = false;   
-                    if (var_DataObject[i]["Tags"] != undefined) {
-                        var_TagMatchTRUE = IsCorrectTagLogic(var_DataObject[i]["Tags"],var_DatahandlerDiv_ClassTags);
-                    }
-                }
-
-                if (var_TagMatchTRUE) {
-                    var array_DataObjectKeys = Object.getOwnPropertyNames(var_DataObject[i]);
-                    fragment += ReplaceDatahandlerDivWithData(var_DatahandlerDiv,var_DataObject[i],array_DataObjectKeys);
-                }
-            }
+        for (i = 0; i < dataSubset.length; i++) {
+            if (dataSubset[i]["Tags"] == undefined) {continue}
+            if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
+                fragment += ReplaceDatahandlerDivWithData(datahandler_divs[j],dataSubset[i]);}
         }
-        if (var_DatahandlerDiv.classList.contains("datahandler-table")) { //not array. DOM token list
-            var_DatahandlerDiv.innerHTML  = "<table>" + fragment + "</table>"}
+        if (datahandler_divs[j].classList.contains("datahandler-table")) { //not array. DOM token list
+            datahandler_divs[j].innerHTML  = "<table>" + fragment + "</table>"}
         else {
-            var_DatahandlerDiv.innerHTML = fragment;}
+            datahandler_divs[j].innerHTML = fragment;}
     }
 };
 
-function ReplaceDatahandlerDivWithData (div, data, keys) {
+function ReplaceDatahandlerDivWithData (div, data) {
+    keys = Object.getOwnPropertyNames(data)
     var div_innerHTML = div.innerHTML
     //For each Data Item Key,
     for (k = 0; k < keys.length; k++) {
@@ -89,6 +80,7 @@ function getTagsfromClass(classlist) {
 };
 
 function IsCorrectTagLogic(Taglist_Element, Taglist_Condition) {
+    if (Taglist_Condition.length == 0) {return true}
     Taglist_OR = ReturnSubset_prefix(Taglist_Condition, "AND_", flip = true)
     Taglist_AND = ReturnSubset_prefix(Taglist_Condition, "AND_")
     
