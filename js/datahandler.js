@@ -38,7 +38,7 @@ function main_datahandler(Identification = "ID") {
                 if (!(var_DatahandlerDiv_ClassTags == undefined || var_DatahandlerDiv_ClassTags.length == 0) ) {
                     var_TagMatchTRUE = false;   
                     if (var_DataObject[i]["Tags"] != undefined) {
-                        var_TagMatchTRUE = IsThereEqualTag(var_DataObject[i]["Tags"],var_DatahandlerDiv_ClassTags);
+                        var_TagMatchTRUE = IsCorrectTagLogic(var_DataObject[i]["Tags"],var_DatahandlerDiv_ClassTags);
                     }
                 }
 
@@ -88,15 +88,36 @@ function getTagsfromClass(classlist) {
     return Tag_list;
 };
 
-function IsThereEqualTag(Taglist1, Taglist2) {
-    for (var i = 0;i<Taglist1.length;i++) {
-        for (var j = 0;j<Taglist2.length;j++) {
-            if (Taglist1[i] == Taglist2[j]) {
-                return true;
-            }           
+function IsCorrectTagLogic(Taglist_Element, Taglist_Condition) {
+    Taglist_OR = ReturnSubset_prefix(Taglist_Condition, "AND_", flip = true)
+    Taglist_AND = ReturnSubset_prefix(Taglist_Condition, "AND_")
+    
+    for (var i = 0;i<Taglist_AND.length;i++) {
+        Taglist_AND[i] = Taglist_AND[i].replace(new RegExp("AND_", 'g'), "")
+        if (!Taglist_Element.includes(Taglist_AND[i])) {
+            return false;}
+    }
+    for (var i = 0;i<Taglist_Element.length;i++) {
+        for (var j = 0;j<Taglist_OR.length;j++) {
+            if (Taglist_Element[i] == Taglist_OR[j]) {
+                return true;}           
         }
     }
     return false;
+}
+
+function ReturnSubset_prefix(array, prefix = "", flip = false){
+    var tmp = []; var tmp_flip = []
+    for (var i = 0; i<array.length;i++){
+        if (array[i].startsWith(prefix)){
+            tmp.push(array[i])} 
+        else {
+            tmp_flip.push(array[i])}
+    }
+    if (flip) {
+        return tmp_flip}
+    else {
+        return tmp}
 }
 
 function flattenData(dataA = []) {
