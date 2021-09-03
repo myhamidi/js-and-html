@@ -44,21 +44,30 @@ function main_datahandler(Identification = "ID") {
 
                 if (var_TagMatchTRUE) {
                     var array_DataObjectKeys = Object.getOwnPropertyNames(var_DataObject[i]);
-                    fragment += ReplaceDatahandlerDivWithData(var_DatahandlerDiv_innerHTML,var_DataObject,array_DataObjectKeys);
+                    fragment += ReplaceDatahandlerDivWithData(var_DatahandlerDiv,var_DataObject[i],array_DataObjectKeys);
                 }
             }
         }
-        var_DatahandlerDiv.innerHTML = fragment;
+        if (var_DatahandlerDiv.classList.contains("datahandler-table")) { //not array. DOM token list
+            var_DatahandlerDiv.innerHTML  = "<table>" + fragment + "</table>"}
+        else {
+            var_DatahandlerDiv.innerHTML = fragment;}
     }
 };
 
-function ReplaceDatahandlerDivWithData (div_innerHTML, data, keys) {
-    //For each Data Item Key
+function ReplaceDatahandlerDivWithData (div, data, keys) {
+    var div_innerHTML = div.innerHTML
+    //For each Data Item Key,
     for (k = 0; k < keys.length; k++) {
         //Replace {{}} statement with corresponding data Property
-        div_innerHTML= div_innerHTML.replace(new RegExp("{{" + keys[k] + "}}", 'g'), data[i][keys[k]])    
+        if (div.classList.contains("datahandler-table")){
+            div_innerHTML= div_innerHTML.replace(new RegExp("{{" + keys[k] + "}}", 'g'), "<td>"+data[keys[k]]+"</td>")}
+        else { 
+        div_innerHTML= div_innerHTML.replace(new RegExp("{{" + keys[k] + "}}", 'g'), data[keys[k]])}
     }
-    return div_innerHTML;
+    if (div.classList.contains("datahandler-table")){
+        return "<tr>" + div_innerHTML + "</tr>"}
+    else {return div_innerHTML}
 }
 
 function getDOM_Prpperties(DOM_objects, DOM_Property) {
