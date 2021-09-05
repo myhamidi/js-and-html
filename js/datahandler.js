@@ -51,34 +51,46 @@ function main_datahandler_main(nth_div, dataSubset) {
 
 function main_datahandler_table(nth_div, dataSubset) {
     j = nth_div;
-    var div_innerHTML = datahandler_divs[j].innerHTML
     var div_tags = getTagsfromClass(datahandler_divs[j].classList);
     var fragment = '';
-    var sumkey = ""
+    var sumkey = "";
+    var numbering = false;
 
     // look for sum, remember and remove
-    if (div_innerHTML.includes("{sum:")) {
-        var idx1 = div_innerHTML.indexOf("{sum:{");
-        var idx2 = div_innerHTML.indexOf("}:", fromIndex = idx1);
-        sumkey = div_innerHTML.substring(idx1+6, idx2);
-        num_cols = div_innerHTML.split("{col}").length - 1;
-        sumkey_colStr = div_innerHTML.substring(idx2+2, idx2+4);
+    if (datahandler_divs[j].innerHTML.includes("{sum:")) {
+        var idx1 = datahandler_divs[j].innerHTML.indexOf("{sum:{");
+        var idx2 = datahandler_divs[j].innerHTML.indexOf("}:", fromIndex = idx1);
+        sumkey = datahandler_divs[j].innerHTML.substring(idx1+6, idx2);
+        num_cols = datahandler_divs[j].innerHTML.split("{col}").length - 1;
+        sumkey_colStr = datahandler_divs[j].innerHTML.substring(idx2+2, idx2+4);
         sumkey_col = parseInt(sumkey_colStr)-1;
-        datahandler_divs[j].innerHTML = div_innerHTML.replace(new RegExp("{sum:{"+sumkey+"}"+":"+sumkey_colStr+"}", 'g'), "")}
+        datahandler_divs[j].innerHTML = datahandler_divs[j].innerHTML.replace(new RegExp("{sum:{"+sumkey+"}"+":"+sumkey_colStr+"}", 'g'), "")}
 
+    //look for num, remember and remove
+    if (datahandler_divs[j].innerHTML.includes("{num}")) {
+        numbering = true;}
+        //datahandler_divs[j].innerHTML = datahandler_divs[j].innerHTML.replace(new RegExp("{num}", 'g'), "")}
+
+    //identify relevant data subset
     var datasubset_valid = []
     for (i = 0; i < dataSubset.length; i++) {
         if (dataSubset[i]["Tags"] == undefined) {continue}
         if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
             datasubset_valid.push(dataSubset[i])}
     }
+
+    // build inner html fragment (and calculate sum if applicable)
     var sum = 0
+    var nth_row = 0
     for (i = 0; i < datasubset_valid.length; i++) {
-            fragment += ReplaceWithData_table(datahandler_divs[j],datasubset_valid[i]);
+            if (numbering) {nth_row = i+1}
+            fragment += ReplaceWithData_table(datahandler_divs[j],datasubset_valid[i], nth_row);
             if (sumkey != "") {
                 // get sum from data
                 sum += datasubset_valid[i][sumkey]}
         }
+
+    // if applicable, create sum row
     if (sumkey != "") {
         fragment += "<tr>" + "<td></td>".repeat(sumkey_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - sumkey_col - 1) + "</tr>" 
     }
@@ -101,15 +113,17 @@ function ReplaceWithData (div, data) {
     return div_innerHTML;
 }
 
-function ReplaceWithData_table (div, data) {
+function ReplaceWithData_table (div, data, numbering) {
     keys = Object.getOwnPropertyNames(data)
     var div_innerHTML = div.innerHTML
-    var ret = "<table>"
 
     //For each Data Item Key,
     for (k = 0; k < keys.length; k++) {
         //Replace {{}} statement with corresponding data Property
-        div_innerHTML = div_innerHTML.replace(new RegExp("{{" + keys[k] + "}}", 'g'), data[keys[k]])}
+        div_innerHTML = div_innerHTML.replace(new RegExp("{{" + keys[k] + "}}", 'g'), data[keys[k]]);
+        if (numbering>0){
+            div_innerHTML = div_innerHTML.replace(new RegExp("{num}", 'g'),numbering);}
+    }
     div_innerHTML = div_innerHTML.replace(new RegExp("{/col}", 'g'), "</td>")
     div_innerHTML = div_innerHTML.replace(new RegExp("{col}", 'g'), "<td>")
     div_innerHTML = div_innerHTML.replace(new RegExp("{/row}", 'g'), "</tr>")
