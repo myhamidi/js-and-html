@@ -16,6 +16,8 @@
 var var_data = Object.assign(data01);  // data link
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
+// var var_data = Object.assign(data01); 
+
 //on window load:
 function main_datahandler(Identification = "ID") {
     for (j = 0; j < datahandler_divs.length; j++) {
@@ -31,22 +33,34 @@ function main_datahandler(Identification = "ID") {
         if (datahandler_divs[j].classList.contains("dh-table")) {
             main_datahandler_table(j, dataSubset);} 
         else {
-            main_datahandler_main(j, dataSubset);}
+            // ReplaceDivContent(j, dataSubset);}
+            ReplaceDivContent(datahandler_divs[j], dataSubset)}
         }
 }
 
 
-function main_datahandler_main(nth_div, dataSubset) {
-    j = nth_div;
-    var div_tags = getTagsfromClass(datahandler_divs[j].classList);
-    var fragment = '';
+function ReplaceDivContent(_div, dataSubset) {
+    /**
+     * Replaces div element with data Array. When no Tags are defined in html, then Tags are ignored
+     * 
+     * _div: div element where Replacement will happen
+     * dataSubset: Array of data that is used for replacement
+     */
+    var div_tags = getTagsfromClass(_div.classList);
+    var fragment = ''; var i;
     
-    for (i = 0; i < dataSubset.length; i++) {
-        if (dataSubset[i]["Tags"] == undefined) {continue}
-        if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
-            fragment += ReplaceWithData(datahandler_divs[j],dataSubset[i]);}
+    if (div_tags = []){
+        for (i = 0; i < dataSubset.length; i++){
+            fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
     }
-    datahandler_divs[j].innerHTML = fragment;
+    else{
+        for (i = 0; i < dataSubset.length; i++) {
+            if (dataSubset[i]["Tags"] == undefined) {continue}
+            if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
+                fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
+        }
+    }   
+    _div.innerHTML = fragment;
 };
 
 function main_datahandler_table(nth_div, dataSubset) {
@@ -99,18 +113,39 @@ function main_datahandler_table(nth_div, dataSubset) {
 
 };
 
-function ReplaceWithData (div, data) {
-    keys = Object.getOwnPropertyNames(data)
-    var div_innerHTML = div.innerHTML
-    //For each Data Item Key,
-    for (k = 0; k < keys.length; k++) {
-        //Replace {{}} statement with corresponding data Property
-        if (div.classList.contains("datahandler-table")){
-            div_innerHTML= div_innerHTML.replace(new RegExp("{{" + keys[k] + "}}", 'g'), "<td>"+data[keys[k]]+"</td>")}
-        else { 
-        div_innerHTML= div_innerHTML.replace(new RegExp("{{" + keys[k] + "}}", 'g'), data[keys[k]])}
+function RetTextReplacedWithData (div, data) {
+    /**
+    * Returns text with data replacement, dependent on div classes
+    * 
+    * text: text that contains replacement pre- and postfix with keys that will be replaced by data
+    * data data in form of a dictionary
+    * AsTable: if true, return the data in form of table colums (to be inserted in one table row)
+    */
+    var ret = "";
+    if (div.classList.contains("datahandler-table")){
+        ret = ReplaceTextWithDictionary(div.innerHTML, data, AsTable=True)}
+    else {
+        ret = ReplaceTextWithDictionary(div.innerHTML, data)}
+    return ret;
+};
+
+function ReplaceTextWithDictionary(text, data, AsTable = false, prefix = "{{", postfix = "}}") {
+    /**
+     * Returns text with data replacement
+     * 
+     * text: text that contains replacement pre- and postfix with keys that will be replaced by data
+     * data data in form of a dictionary
+     * AsTable: if true, return the data in form of table colums (to be inserted in one table row)
+     */
+    keys = Object.getOwnPropertyNames(data);
+    var ret = text;
+    for (i = 0; i <keys.length; i++) {
+        if (AsTable) {            
+            ret = ret.replace(new RegExp(prefix + keys[i] + postfix, 'g'), "<td>"+data[keys[i]]+"</td>");}
+        else {
+            ret = ret.replace(new RegExp(prefix + keys[i] + postfix, 'g'), data[keys[i]]);}
     }
-    return div_innerHTML;
+    return ret;
 }
 
 function ReplaceWithData_table (div, data, numbering) {
@@ -194,5 +229,3 @@ function flattenData(dataA = []) {
      }
     return tmp;
 }
-
-

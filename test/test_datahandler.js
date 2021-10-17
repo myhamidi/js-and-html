@@ -2,7 +2,7 @@
 //TEST                                                  *
 //*******************************************************
 
-div_element = document.getElementById("test result");
+div_elementJ = document.getElementById("test result js");
 
 function test_flattenData() {
     var dataA = {
@@ -26,10 +26,26 @@ function test_flattenData() {
 
     
     if (IsEqual_ListofObjects(dataA_flat, dataB)) {
-        div_element.innerHTML += "test_flattenData() passed </br>"
+        div_elementJ.innerHTML += "test_flattenData() passed </br>"
     } else {
-        div_element.innerHTML += "test_flattenData() failed </br>"
+        div_elementJ.innerHTML += "test_flattenData() failed </br>"
     }             
 }
 
+function test_ReplaceTextWithDictionary() {
+    text = '{{key1}} and {{key2}}'
+    data = {
+            "key1": "Hello 1",
+            "key2": "World 1"
+        }
+    var ret = ReplaceTextWithDictionary(text, data, AsTable = false, prefix = '{{', postfix = '}}')
+    if (ret == "Hello 1 and World 1") {
+        div_elementJ.innerHTML += "test_ReplaceTextWithDictionary() passed </br>"
+    } else {
+        div_elementJ.innerHTML += "test_ReplaceTextWithDictionary() failed </br>"
+    }
+
+}
+
 test_flattenData();
+test_ReplaceTextWithDictionary();

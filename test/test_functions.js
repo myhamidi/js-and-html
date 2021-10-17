@@ -1,4 +1,6 @@
-div_element = document.getElementById("test result");
+
+div_elementJ = document.getElementById("test result js");
+div_element = document.getElementById("test result html js");
 
 function IsEqual_ListofObjects(a, b) {
     var a_keys = Object.keys(a);
@@ -58,9 +60,9 @@ function test_IsEqual_LsitofObjects(){
     if (IsEqual_ListofObjects(A,B) == false &&
         IsEqual_ListofObjects(A,C) == false && 
         IsEqual_ListofObjects(A,D) == true) {
-        div_element.innerHTML += "test_IsEqual_ListofObjects() passed </br>"
+        div_elementJ.innerHTML += "test_IsEqual_ListofObjects() passed </br>"
     } else {
-        div_element.innerHTML += "test_IsEqual_ListofObjects() failed </br>"
+        div_elementJ.innerHTML += "test_IsEqual_ListofObjects() failed </br>"
     }    
 }
 
