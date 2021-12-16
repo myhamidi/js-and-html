@@ -63,7 +63,7 @@ function ReplaceDivContent(_div, dataSubset) {
     var div_tags = getTagsfromClass(_div.classList);
     var fragment = ''; var i;
     
-    if (div_tags == []){
+    if (div_tags.length == 0){
         for (i = 0; i < dataSubset.length; i++){
             fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
     }
