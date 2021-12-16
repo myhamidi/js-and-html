@@ -38,6 +38,20 @@ function main_datahandler(Identification = "ID") {
         }
 }
 
+function RetDataSubSet(id = "") {
+    /**
+     * Returns data subset that is allocated to the id. If id="" then all data is taken. 
+     * If id does not match to key in data then [] is returned.
+     */
+     var dataSubset = [];
+     if (id == ""){
+        dataSubset = flattenData(var_data)} 
+    else {
+        if (Object.keys(var_data).includes(id)){
+            dataSubset = var_data[id]}
+     }
+     return dataSubset;
+    }
 
 function ReplaceDivContent(_div, dataSubset) {
     /**
@@ -49,7 +63,7 @@ function ReplaceDivContent(_div, dataSubset) {
     var div_tags = getTagsfromClass(_div.classList);
     var fragment = ''; var i;
     
-    if (div_tags = []){
+    if (div_tags == []){
         for (i = 0; i < dataSubset.length; i++){
             fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
     }
