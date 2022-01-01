@@ -2,23 +2,37 @@
 <html>
 
 <head>
+    <title>Example Datahanlder</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/body.css">
-
 </head>
 
 <body>
-    <div id = "test result">
-
+    <!-- Presence of datahandler div to trigger datahandler functions-->
+    Example Data: Start --------------------------------------<br><br>
+    <div id="Dokumente" class="datahandler-root [Mars] [AND_Venus]">
+        {{ID}}<br/>
+        {{Name}}<br/>
+        {{Description}}<br/><br/>
     </div>
+    Example Data: End-----------------------------------------<br><br>
+    <div id="test result js"><b>Test Results js</b></br></div>
+    <div id="test result html js"><b>Test Results html js</b></br></div>
+    
 </body>
 
-<!-- JS -->
-<script src="js/body.js"></script>
+<script src="js/data-example.js"></script>
 <script src="js/datahandler.js"></script>
 <script src="test/test_functions.js"></script>
 <script src="test/test_datahandler.js"></script>
+<script src="test/test_datahandler_example.js"></script>
+
+<script>
+window.onload = function () {
+        main_datahandler(Identification = "Global"); 
+        //sidebar_main();
+    } 
+//ReplaceDivContent(document.getElementById("Dokumente"), dataSubset = var_data["Dokumente"]); //to be repalced with main
+//test_ReplaceDivContent(div_id = "Dokumente");
+</script>
 </html>

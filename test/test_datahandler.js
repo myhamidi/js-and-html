@@ -4,6 +4,28 @@
 
 div_elementJ = document.getElementById("test result js");
 
+function test_passed(fname) {
+    div_elementJ.innerHTML += fname + '<font style="color:green"> passed <br/>'
+}
+
+function test_failed(fname) {
+    div_elementJ.innerHTML += fname + '<font style="color:red"> failed </font> <br/>'
+}
+
+function test_ReturnSubsetWithPrefix() {
+    Taglist  = ["Mercury", "Venus", "AND_Earth", "Mars", "AND_Jupiter"];
+    Taglist_subset = ReturnSubsetWithPrefix(Taglist, "AND_");
+    Taglist_subset_flip = ReturnSubsetWithPrefix(Taglist, "AND_", flip=true);
+    Taglist_subset_check = ["Earth", "Jupiter"];
+    Taglist_subset_flip_check = ["Mecury", "Venus", "Mars"];
+    
+    if (IsEqual_List(Taglist_subset, Taglist_subset_check)) {
+        test_passed(arguments.callee.name)} 
+    else {
+        test_failed(arguments.callee.name)}   
+}
+
+
 function test_flattenData() {
     var dataA = {
         "Alpha":
@@ -26,10 +48,9 @@ function test_flattenData() {
 
     
     if (IsEqual_ListofObjects(dataA_flat, dataB)) {
-        div_elementJ.innerHTML += "test_flattenData() passed </br>"
-    } else {
-        div_elementJ.innerHTML += "test_flattenData() failed </br>"
-    }             
+        test_passed(arguments.callee.name)} 
+    else {
+        test_failed(arguments.callee.name)}         
 }
 
 function test_ReplaceTextWithDictionary() {
@@ -40,12 +61,10 @@ function test_ReplaceTextWithDictionary() {
         }
     var ret = ReplaceTextWithDictionary(text, data, AsTable = false, prefix = '{{', postfix = '}}')
     if (ret == "Hello 1 and World 1") {
-        div_elementJ.innerHTML += "test_ReplaceTextWithDictionary() passed </br>"
-    } else {
-        div_elementJ.innerHTML += "test_ReplaceTextWithDictionary() failed </br>"
-    }
-
+        test_passed(arguments.callee.name)} 
+    else {
+        test_failed(arguments.callee.name)}   
 }
-
+test_ReturnSubsetWithPrefix()
 test_flattenData();
 test_ReplaceTextWithDictionary();

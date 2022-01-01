@@ -5,7 +5,8 @@ var data01 = {
             {
                 "ID": 1234,
                 "Name": "Hello World",
-                "Description": "..."
+                "Description": "...",
+                "Tags": ["Mars", "Venus"]
             },
             {
                 "ID": 1256,

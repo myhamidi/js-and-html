@@ -13,7 +13,7 @@
 
 
 //parameters
-var var_data = Object.assign(data01);  // data link
+var var_data = Object.assign(data01);  // data link in html file
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
 // var var_data = Object.assign(data01); 
@@ -199,33 +199,37 @@ function getTagsfromClass(classlist) {
     return Tag_list;
 };
 
-function IsCorrectTagLogic(Taglist_Element, Taglist_Condition) {
-    if (Taglist_Condition.length == 0) {return true}
-    Taglist_OR = ReturnSubset_prefix(Taglist_Condition, "AND_", flip = true)
-    Taglist_AND = ReturnSubset_prefix(Taglist_Condition, "AND_")
+function IsCorrectTagLogic(Tags_Dataelement, Tags_div) {
+    if (Tags_div.length == 0) {return true}
+    Taglist_OR = ReturnSubsetWithPrefix(Tags_div, "AND_", flip = true)
+    Taglist_AND = ReturnSubsetWithPrefix(Tags_div, "AND_")
     
     for (var i = 0;i<Taglist_AND.length;i++) {
         Taglist_AND[i] = Taglist_AND[i].replace(new RegExp("AND_", 'g'), "")
-        if (!Taglist_Element.includes(Taglist_AND[i])) {
+        if (!Tags_Dataelement.includes(Taglist_AND[i])) {
             return false;}
     }
-    for (var i = 0;i<Taglist_Element.length;i++) {
+    for (var i = 0;i<Tags_Dataelement.length;i++) {
         for (var j = 0;j<Taglist_OR.length;j++) {
-            if (Taglist_Element[i] == Taglist_OR[j]) {
+            if (Tags_Dataelement[i] == Taglist_OR[j]) {
                 return true;}           
         }
     }
     return false;
 }
 
-function ReturnSubset_prefix(array, prefix = "", flip = false){
+function ReturnSubsetWithPrefix(array, prefix = "", removePrefix = true, flip = false){
     var tmp = []; var tmp_flip = []
     for (var i = 0; i<array.length;i++){
         if (array[i].startsWith(prefix)){
-            tmp.push(array[i])} 
+            if (removePrefix) {
+                tmp.push(array[i].replace(new RegExp(prefix, 'g'), ""))}
+            else {
+                tmp.push(array[i])}
+            } 
         else {
             tmp_flip.push(array[i])}
-    }
+        }
     if (flip) {
         return tmp_flip}
     else {
