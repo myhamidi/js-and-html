@@ -18,7 +18,7 @@ var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
 // var var_data = Object.assign(data01); 
 
-//on window load:
+//on window load:vvv
 function main_datahandler(Identification = "ID") {
     for (j = 0; j < datahandler_divs.length; j++) {
         var dataSubset = [];
@@ -31,7 +31,7 @@ function main_datahandler(Identification = "ID") {
             dataSubset = flattenData(var_data)}
         
         if (datahandler_divs[j].classList.contains("dh-table")) {
-            main_datahandler_table(j, dataSubset);} 
+            main_datahandler_table(datahandler_divs[j], dataSubset);} 
         else {
             // ReplaceDivContent(j, dataSubset);}
             ReplaceDivContent(datahandler_divs[j], dataSubset)}
@@ -40,13 +40,13 @@ function main_datahandler(Identification = "ID") {
 
 function RetDataSubSet(id = "") {
     /**
-     * Returns data subset that is allocated to the id. If id="" then all data is taken. 
+     * Returns data subset that is allocated to the id. If id="" then all data is returned
      * If id does not match to key in data then [] is returned.
      */
      var dataSubset = [];
      if (id == ""){
         dataSubset = flattenData(var_data)} 
-    else {
+     else {
         if (Object.keys(var_data).includes(id)){
             dataSubset = var_data[id]}
      }
@@ -55,7 +55,7 @@ function RetDataSubSet(id = "") {
 
 function ReplaceDivContent(_div, dataSubset) {
     /**
-     * Replaces div element with data Array. When no Tags are defined in html, then Tags are ignored
+     * Replaces div element with data Array. When no Tags are defined in html then all data is placed in html
      * 
      * _div: div element where Replacement will happen
      * dataSubset: Array of data that is used for replacement
@@ -77,27 +77,27 @@ function ReplaceDivContent(_div, dataSubset) {
     _div.innerHTML = fragment;
 };
 
-function main_datahandler_table(nth_div, dataSubset) {
-    j = nth_div;
-    var div_tags = getTagsfromClass(datahandler_divs[j].classList);
+function main_datahandler_table(_div, dataSubset) {
+    //j = nth_div;
+    var div_tags = getTagsfromClass(_div.classList);
     var fragment = '';
     var sumkey = "";
     var numbering = false;
 
     // look for sum, remember and remove
-    if (datahandler_divs[j].innerHTML.includes("{sum:")) {
-        var idx1 = datahandler_divs[j].innerHTML.indexOf("{sum:{");
-        var idx2 = datahandler_divs[j].innerHTML.indexOf("}:", fromIndex = idx1);
-        sumkey = datahandler_divs[j].innerHTML.substring(idx1+6, idx2);
-        num_cols = datahandler_divs[j].innerHTML.split("{col}").length - 1;
-        sumkey_colStr = datahandler_divs[j].innerHTML.substring(idx2+2, idx2+4);
+    if (_div.innerHTML.includes("{sum:")) {
+        var idx1 = _div.innerHTML.indexOf("{sum:{");
+        var idx2 = _div.innerHTML.indexOf("}:", fromIndex = idx1);
+        sumkey = _div.innerHTML.substring(idx1+6, idx2);
+        num_cols = _div.innerHTML.split("{col}").length - 1;
+        sumkey_colStr = _div.innerHTML.substring(idx2+2, idx2+4);
         sumkey_col = parseInt(sumkey_colStr)-1;
-        datahandler_divs[j].innerHTML = datahandler_divs[j].innerHTML.replace(new RegExp("{sum:{"+sumkey+"}"+":"+sumkey_colStr+"}", 'g'), "")}
+        _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+sumkey+"}"+":"+sumkey_colStr+"}", 'g'), "")}
 
     //look for num, remember and remove
-    if (datahandler_divs[j].innerHTML.includes("{num}")) {
+    if (_div.innerHTML.includes("{num}")) {
         numbering = true;}
-        //datahandler_divs[j].innerHTML = datahandler_divs[j].innerHTML.replace(new RegExp("{num}", 'g'), "")}
+        //_div.innerHTML = _div.innerHTML.replace(new RegExp("{num}", 'g'), "")}
 
     //identify relevant data subset
     var datasubset_valid = []
@@ -112,7 +112,7 @@ function main_datahandler_table(nth_div, dataSubset) {
     var nth_row = 0
     for (i = 0; i < datasubset_valid.length; i++) {
             if (numbering) {nth_row = i+1}
-            fragment += ReplaceWithData_table(datahandler_divs[j],datasubset_valid[i], nth_row);
+            fragment += ReplaceWithData_table(_div,datasubset_valid[i], nth_row);
             if (sumkey != "") {
                 // get sum from data
                 sum += datasubset_valid[i][sumkey]}
@@ -123,7 +123,7 @@ function main_datahandler_table(nth_div, dataSubset) {
         fragment += "<tr>" + "<td></td>".repeat(sumkey_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - sumkey_col - 1) + "</tr>" 
     }
 
-    datahandler_divs[j].innerHTML  = "<table>" + fragment + "</table>"
+    _div.innerHTML  = "<table>" + fragment + "</table>"
 
 };
 
@@ -143,6 +143,7 @@ function RetTextReplacedWithData (div, data) {
     return ret;
 };
 
+// Unit Test
 function ReplaceTextWithDictionary(text, data, AsTable = false, prefix = "{{", postfix = "}}") {
     /**
      * Returns text with data replacement
@@ -189,6 +190,7 @@ function getDOM_Prpperties(DOM_objects, DOM_Property) {
     return array;
 };
 
+//Unit Test
 function getTagsfromClass(classlist) {
     var Tag_list = [];
     for (var i = 0;i< classlist.length;i++) {
@@ -201,7 +203,7 @@ function getTagsfromClass(classlist) {
 
 function IsCorrectTagLogic(Tags_Dataelement, Tags_div) {
     if (Tags_div.length == 0) {return true}
-    Taglist_OR = ReturnSubsetWithPrefix(Tags_div, "AND_", flip = true)
+    Taglist_OR = ReturnSubsetWithPrefix(Tags_div, "AND_", true, true)
     Taglist_AND = ReturnSubsetWithPrefix(Tags_div, "AND_")
     
     for (var i = 0;i<Taglist_AND.length;i++) {
@@ -218,6 +220,7 @@ function IsCorrectTagLogic(Tags_Dataelement, Tags_div) {
     return false;
 }
 
+// Unit Tests
 function ReturnSubsetWithPrefix(array, prefix = "", removePrefix = true, flip = false){
     var tmp = []; var tmp_flip = []
     for (var i = 0; i<array.length;i++){
@@ -236,6 +239,7 @@ function ReturnSubsetWithPrefix(array, prefix = "", removePrefix = true, flip = 
         return tmp}
 }
 
+//Unit Test
 function flattenData(dataA = []) {
     var keys = Object.keys(dataA);
     var tmp = [];

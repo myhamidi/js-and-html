@@ -65,6 +65,20 @@ function test_ReplaceTextWithDictionary() {
     else {
         test_failed(arguments.callee.name)}   
 }
+
+function test_getTagsfromClass() {
+
+    classList = ['Stadt', 'Land', 'Fluss', '[City]', '[Country]', '[River]'];
+    TagList = ['City', 'Country', 'River'];
+
+    testList = getTagsfromClass(classList)
+    if (IsEqual_ListofObjects(testList,TagList)) {
+        test_passed(arguments.callee.name)} 
+    else {
+        test_failed(arguments.callee.name)}   
+}
+
 test_ReturnSubsetWithPrefix()
 test_flattenData();
 test_ReplaceTextWithDictionary();
+test_getTagsfromClass();
