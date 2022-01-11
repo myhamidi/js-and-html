@@ -64,10 +64,12 @@ function ReplaceDivContent(_div, dataSubset) {
         for (i = 0; i < dataSubset.length; i++){
             fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
     }
-    else{
+    if (div_tags.length > 0){
+        var datasubset_valid = [];
         for (i = 0; i < dataSubset.length; i++) {
             if (dataSubset[i]["Tags"] == undefined) {continue}
             if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
+                datasubset_valid.push(dataSubset[i]);
                 fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
         }
     }   
@@ -75,7 +77,7 @@ function ReplaceDivContent(_div, dataSubset) {
 };
 
 function GetSumInfo(_divInnerHTML) {
-    suminfo = {}; text = _divInnerHTML;
+    suminfo = {"key": "", "colStr": ""}; text = _divInnerHTML;
     var idx1 = text.indexOf("{sum:{");
     var idx2 = text.indexOf("}:", fromIndex = idx1);
     suminfo.key = text.substring(idx1+6, idx2);
@@ -89,10 +91,9 @@ function main_datahandler_table(_div, dataSubset) {
     var fragment = '';
     var numbering = false;
 
-    // look for sum, remember and remove
-    if (_div.innerHTML.includes("{sum:")) {
-        suminfo = GetSumInfo(_div.innerHTML);
-        _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+suminfo.key+"}"+":"+suminfo.colStr+"}", 'g'), "")}
+    // GEt Sum info and remove (if applicable)
+    suminfo = GetSumInfo(_div.innerHTML);
+    _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+suminfo.key+"}"+":"+suminfo.colStr+"}", 'g'), "")
 
     //look for num, remember and remove
     if (_div.innerHTML.includes("{num}")) {
