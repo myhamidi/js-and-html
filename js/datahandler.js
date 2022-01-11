@@ -77,6 +77,16 @@ function ReplaceDivContent(_div, dataSubset) {
     _div.innerHTML = fragment;
 };
 
+function GetSumInfo(_div) {
+    suminfo = {};
+    var idx1 = _div.innerHTML.indexOf("{sum:{");
+    var idx2 = _div.innerHTML.indexOf("}:", fromIndex = idx1);
+    suminfo.key = _div.innerHTML.substring(idx1+6, idx2);
+    suminfo.colStr = _div.innerHTML.substring(idx2+2, idx2+4);
+    suminfo.col = parseInt(suminfo.colStr)-1;
+    return suminfo;
+};
+
 function main_datahandler_table(_div, dataSubset) {
     //j = nth_div;
     var div_tags = getTagsfromClass(_div.classList);
@@ -86,13 +96,8 @@ function main_datahandler_table(_div, dataSubset) {
 
     // look for sum, remember and remove
     if (_div.innerHTML.includes("{sum:")) {
-        var idx1 = _div.innerHTML.indexOf("{sum:{");
-        var idx2 = _div.innerHTML.indexOf("}:", fromIndex = idx1);
-        sumkey = _div.innerHTML.substring(idx1+6, idx2);
-        num_cols = _div.innerHTML.split("{col}").length - 1;
-        sumkey_colStr = _div.innerHTML.substring(idx2+2, idx2+4);
-        sumkey_col = parseInt(sumkey_colStr)-1;
-        _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+sumkey+"}"+":"+sumkey_colStr+"}", 'g'), "")}
+        suminfo = GetSumInfo(_div);
+        _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+suminfo.key+"}"+":"+suminfo.colStr+"}", 'g'), "")}
 
     //look for num, remember and remove
     if (_div.innerHTML.includes("{num}")) {
@@ -113,14 +118,15 @@ function main_datahandler_table(_div, dataSubset) {
     for (i = 0; i < datasubset_valid.length; i++) {
             if (numbering) {nth_row = i+1}
             fragment += ReplaceWithData_table(_div,datasubset_valid[i], nth_row);
-            if (sumkey != "") {
+            if (suminfo.key != "") {
                 // get sum from data
-                sum += datasubset_valid[i][sumkey]}
+                sum += datasubset_valid[i][suminfo.key]}
         }
 
     // if applicable, create sum row
-    if (sumkey != "") {
-        fragment += "<tr>" + "<td></td>".repeat(sumkey_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - sumkey_col - 1) + "</tr>" 
+    if (suminfo.key != "") {
+        num_cols = _div.innerHTML.split("{col}").length - 1;
+        fragment += "<tr>" + "<td></td>".repeat(suminfo.col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - suminfo.col - 1) + "</tr>" 
     }
 
     _div.innerHTML  = "<table>" + fragment + "</table>"
