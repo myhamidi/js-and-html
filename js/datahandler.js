@@ -72,6 +72,10 @@ function ReplaceDivContent(_div, dataSubset) {
                 datasubset_valid.push(dataSubset[i]);
                 fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
         }
+        //MOHI Harmonize replacement:
+        // for (i = 0; i < datasubset_valid.length; i++) {
+        //     fragment += RetTextReplacedWithData(_div,datasubset_valid[i]);}
+        // }
     }   
     _div.innerHTML = fragment;
 };
