@@ -77,13 +77,12 @@ function ReplaceDivContent(_div, dataSubset) {
     _div.innerHTML = fragment;
 };
 
-function GetSumInfo(_div) {
-    suminfo = {};
-    var idx1 = _div.innerHTML.indexOf("{sum:{");
-    var idx2 = _div.innerHTML.indexOf("}:", fromIndex = idx1);
-    suminfo.key = _div.innerHTML.substring(idx1+6, idx2);
-    suminfo.colStr = _div.innerHTML.substring(idx2+2, idx2+4);
-    suminfo.col = parseInt(suminfo.colStr)-1;
+function GetSumInfo(_divInnerHTML) {
+    suminfo = {}; text = _divInnerHTML;
+    var idx1 = text.indexOf("{sum:{");
+    var idx2 = text.indexOf("}:", fromIndex = idx1);
+    suminfo.key = text.substring(idx1+6, idx2);
+    suminfo.colStr = text.substring(idx2+2, idx2+4);
     return suminfo;
 };
 
@@ -91,12 +90,11 @@ function main_datahandler_table(_div, dataSubset) {
     //j = nth_div;
     var div_tags = getTagsfromClass(_div.classList);
     var fragment = '';
-    var sumkey = "";
     var numbering = false;
 
     // look for sum, remember and remove
     if (_div.innerHTML.includes("{sum:")) {
-        suminfo = GetSumInfo(_div);
+        suminfo = GetSumInfo(_div.innerHTML);
         _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+suminfo.key+"}"+":"+suminfo.colStr+"}", 'g'), "")}
 
     //look for num, remember and remove
@@ -126,7 +124,8 @@ function main_datahandler_table(_div, dataSubset) {
     // if applicable, create sum row
     if (suminfo.key != "") {
         num_cols = _div.innerHTML.split("{col}").length - 1;
-        fragment += "<tr>" + "<td></td>".repeat(suminfo.col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - suminfo.col - 1) + "</tr>" 
+        insert_col = parseInt(suminfo.colStr)-1; // repeat n-1 times
+        fragment += "<tr>" + "<td></td>".repeat(insert_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - insert_col - 1) + "</tr>" 
     }
 
     _div.innerHTML  = "<table>" + fragment + "</table>"

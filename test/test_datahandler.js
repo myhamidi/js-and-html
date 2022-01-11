@@ -12,6 +12,16 @@ function test_failed(fname) {
     div_elementJ.innerHTML += fname + '<font style="color:red"> failed </font> <br/>'
 }
 
+function test_GetSumInfo() {
+    input = '{row} {col} <a href="{{url}}">{{name}}</a> {/col} {col} {{value}} {/col} {/row} {sum:{value}:03}'
+    test_info = {colStr: "03", key: "value"};
+    info = GetSumInfo(input);
+    if (test_info.colStr == info.colStr && test_info.key == info.key) {
+        test_passed(arguments.callee.name)} 
+    else {
+        test_failed(arguments.callee.name)}
+}
+
 function test_ReturnSubsetWithPrefix() {
     Taglist  = ["Mercury", "Venus", "AND_Earth", "Mars", "AND_Jupiter"];
     Taglist_subset = ReturnSubsetWithPrefix(Taglist, "AND_");
@@ -78,6 +88,7 @@ function test_getTagsfromClass() {
         test_failed(arguments.callee.name)}   
 }
 
+test_GetSumInfo()
 test_ReturnSubsetWithPrefix()
 test_flattenData();
 test_ReplaceTextWithDictionary();
