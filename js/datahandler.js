@@ -18,40 +18,37 @@ var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
 // var var_data = Object.assign(data01); 
 
-//on window load:vvv
+//on window load:
 function main_datahandler(Identification = "ID") {
     for (j = 0; j < datahandler_divs.length; j++) {
-        var dataSubset = [];
-        if (Identification == "ID") {
-            if (Object.keys(var_data).includes(datahandler_divs[j].id)){
-                dataSubset = var_data[datahandler_divs[j].id]}
-            else {continue} // when div id (of class datahandler) was not found in data
-            }
-        if (Identification == "Global") {
-            dataSubset = flattenData(var_data)}
+        
+        var dataSubset = RetDataSubSet(Identification);
         
         if (datahandler_divs[j].classList.contains("dh-table")) {
             main_datahandler_table(datahandler_divs[j], dataSubset);} 
         else {
             // ReplaceDivContent(j, dataSubset);}
             ReplaceDivContent(datahandler_divs[j], dataSubset)}
-        }
+    }
 }
 
-function RetDataSubSet(id = "") {
+function RetDataSubSet(Identification = "ID") {
     /**
-     * Returns data subset that is allocated to the id. If id="" then all data is returned
-     * If id does not match to key in data then [] is returned.
+     * Returns data subset that is allocated to the id. If Identification ="" then all data is returned
+     * If Identification  does not match to key in data then [] is returned.
      */
-     var dataSubset = [];
-     if (id == ""){
-        dataSubset = flattenData(var_data)} 
-     else {
-        if (Object.keys(var_data).includes(id)){
-            dataSubset = var_data[id]}
-     }
-     return dataSubset;
+    var dataSubset = [];
+    if (Identification == "Global") {
+        dataSubset = flattenData(var_data)}
+    if (Identification == "ID") {
+        keys = Object.keys(var_data);
+        for (k = 0; k<keys.length; k++) {
+            if (datahandler_divs[j].id == keys[k]) {
+                dataSubset = var_data[keys[k]]}
+        }
     }
+     return dataSubset;
+}
 
 function ReplaceDivContent(_div, dataSubset) {
     /**
