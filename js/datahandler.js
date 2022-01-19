@@ -12,6 +12,25 @@
 // ##############################################################################################################
 
 
+// main_datahandler
+    // RetDataSubSet
+        // flattenData -
+    // main_datahandler_table
+        // getTagsfromClass - 
+        // GetSumInfo -
+        // IsCorrectTagLogic
+            // ReturnSubsetWithPrefix - 
+        // ReplaceWithData_table
+        
+    // ReplaceDivContent
+        // getTagsfromClass - 
+        // IsCorrectTagLogic
+            // ReturnSubsetWithPrefix - 
+        // RetTextReplacedWithData
+            // ReplaceTextWithDictionary- 
+
+
+
 //parameters
 var var_data = Object.assign(data01);  // data link in html file
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
@@ -20,9 +39,11 @@ var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
 //on window load:
 function main_datahandler(Identification = "ID") {
+    
+    
     for (j = 0; j < datahandler_divs.length; j++) {
         
-        var dataSubset = RetDataSubSet(Identification);
+        var dataSubset = RetDataSubSet(Identification); // Identification dependend on data set. Default
         
         if (datahandler_divs[j].classList.contains("dh-table")) {
             main_datahandler_table(datahandler_divs[j], dataSubset);} 
@@ -59,24 +80,24 @@ function ReplaceDivContent(_div, dataSubset) {
      */
     var div_tags = getTagsfromClass(_div.classList);
     var fragment = ''; var i;
-    
+
+    var datasubset_valid = [];
     if (div_tags.length == 0){
         for (i = 0; i < dataSubset.length; i++){
-            fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
+            datasubset_valid.push(dataSubset[i]);}
+            // fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
     }
     if (div_tags.length > 0){
-        var datasubset_valid = [];
         for (i = 0; i < dataSubset.length; i++) {
             if (dataSubset[i]["Tags"] == undefined) {continue}
             if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
-                datasubset_valid.push(dataSubset[i]);
-                fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
+                datasubset_valid.push(dataSubset[i]);}
         }
-        //MOHI Harmonize replacement:
-        // for (i = 0; i < datasubset_valid.length; i++) {
-        //     fragment += RetTextReplacedWithData(_div,datasubset_valid[i]);}
-        // }
-    }   
+    }
+
+    for (i = 0; i < datasubset_valid.length; i++) {
+        fragment += RetTextReplacedWithData(_div,datasubset_valid[i]);}
+
     _div.innerHTML = fragment;
 };
 
@@ -92,18 +113,17 @@ function GetSumInfo(_divInnerHTML) {
 function main_datahandler_table(_div, dataSubset) {
     //j = nth_div;
     var div_tags = getTagsfromClass(_div.classList);
-    var fragment = '';
-    var numbering = false;
-
-    // GEt Sum info and remove (if applicable)
-    suminfo = GetSumInfo(_div.innerHTML);
-    _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+suminfo.key+"}"+":"+suminfo.colStr+"}", 'g'), "")
-
-    //look for num, remember and remove
-    if (_div.innerHTML.includes("{num}")) {
-        numbering = true;}
-        //_div.innerHTML = _div.innerHTML.replace(new RegExp("{num}", 'g'), "")}
-
+    var fragment = ''; var i;
+    
+    if (_div.classList.contains("dh-table")) {
+        var suminfo = GetSumInfo(_div.innerHTML);
+        var numbering = false;
+        if (_div.innerHTML.includes("{num}")) {
+            numbering = true;}
+        // delete
+        _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+suminfo.key+"}"+":"+suminfo.colStr+"}", 'g'), "")
+    } 
+    
     //identify relevant data subset
     var datasubset_valid = []
     for (i = 0; i < dataSubset.length; i++) {
@@ -117,7 +137,8 @@ function main_datahandler_table(_div, dataSubset) {
     var nth_row = 0
     for (i = 0; i < datasubset_valid.length; i++) {
             if (numbering) {nth_row = i+1}
-            fragment += ReplaceWithData_table(_div,datasubset_valid[i], nth_row);
+            fragment += ReplaceWithData_table(_div.innerHTML,datasubset_valid[i], nth_row);
+            // fragment += ReplaceWithData_table(_div,datasubset_valid[i], nth_row);
             if (suminfo.key != "") {
                 // get sum from data
                 sum += datasubset_valid[i][suminfo.key]}
@@ -134,59 +155,60 @@ function main_datahandler_table(_div, dataSubset) {
 
 };
 
-function RetTextReplacedWithData (div, data) {
+function RetTextReplacedWithData (div, dataElement) {
     /**
-    * Returns text with data replacement, dependent on div classes
+    * Returns text with dataElement replacement, dependent on div classes
     * 
-    * text: text that contains replacement pre- and postfix with keys that will be replaced by data
-    * data data in form of a dictionary
+    * text: text that contains replacement pre- and postfix with keys that will be replaced by dataElement
+    * dataElement: data in form of a dictionary
     * AsTable: if true, return the data in form of table colums (to be inserted in one table row)
     */
     var ret = "";
     if (div.classList.contains("datahandler-table")){
-        ret = ReplaceTextWithDictionary(div.innerHTML, data, AsTable=True)}
+        ret = ReplaceTextWithDictionary(div.innerHTML, dataElement, AsTable=True)}
     else {
-        ret = ReplaceTextWithDictionary(div.innerHTML, data)}
+        ret = ReplaceTextWithDictionary(div.innerHTML, dataElement)}
     return ret;
 };
 
 // Unit Test
-function ReplaceTextWithDictionary(text, data, AsTable = false, prefix = "{{", postfix = "}}") {
+function ReplaceTextWithDictionary(text, dataElement, AsTable = false, prefix = "{{", postfix = "}}") {
     /**
      * Returns text with data replacement
      * 
-     * text: text that contains replacement pre- and postfix with keys that will be replaced by data
-     * data data in form of a dictionary
+     * text: text that contains replacement pre- and postfix with keys that will be replaced by dataElement
+     * dataElement: data in form of a dictionary
      * AsTable: if true, return the data in form of table colums (to be inserted in one table row)
      */
-    keys = Object.getOwnPropertyNames(data);
+    keys = Object.getOwnPropertyNames(dataElement);
     var ret = text;
     for (i = 0; i <keys.length; i++) {
         if (AsTable) {            
-            ret = ret.replace(new RegExp(prefix + keys[i] + postfix, 'g'), "<td>"+data[keys[i]]+"</td>");}
+            ret = ret.replace(new RegExp(prefix + keys[i] + postfix, 'g'), "<td>"+dataElement[keys[i]]+"</td>");}
         else {
-            ret = ret.replace(new RegExp(prefix + keys[i] + postfix, 'g'), data[keys[i]]);}
+            ret = ret.replace(new RegExp(prefix + keys[i] + postfix, 'g'), dataElement[keys[i]]);}
     }
     return ret;
 }
 
-function ReplaceWithData_table (div, data, numbering) {
+
+function ReplaceWithData_table (text, data, numbering, prefix = "{{", postfix = "}}") {
     keys = Object.getOwnPropertyNames(data)
-    var div_innerHTML = div.innerHTML
+    // var div_innerHTML = div.innerHTML
 
     //For each Data Item Key,
     for (k = 0; k < keys.length; k++) {
         //Replace {{}} statement with corresponding data Property
-        div_innerHTML = div_innerHTML.replace(new RegExp("{{" + keys[k] + "}}", 'g'), data[keys[k]]);
+        text = text.replace(new RegExp(prefix + keys[k] + postfix, 'g'), data[keys[k]]);
         if (numbering>0){
-            div_innerHTML = div_innerHTML.replace(new RegExp("{num}", 'g'),numbering);}
+            text = text.replace(new RegExp("{num}", 'g'),numbering);}
     }
-    div_innerHTML = div_innerHTML.replace(new RegExp("{/col}", 'g'), "</td>")
-    div_innerHTML = div_innerHTML.replace(new RegExp("{col}", 'g'), "<td>")
-    div_innerHTML = div_innerHTML.replace(new RegExp("{/row}", 'g'), "</tr>")
-    div_innerHTML = div_innerHTML.replace(new RegExp("{row}", 'g'), "<tr>")
+    text = text.replace(new RegExp("{/col}", 'g'), "</td>")
+    text = text.replace(new RegExp("{col}", 'g'), "<td>")
+    text = text.replace(new RegExp("{/row}", 'g'), "</tr>")
+    text = text.replace(new RegExp("{row}", 'g'), "<tr>")
     
-    return div_innerHTML;
+    return text;
 }
 
 function getDOM_Prpperties(DOM_objects, DOM_Property) {

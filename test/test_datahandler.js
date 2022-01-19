@@ -76,7 +76,29 @@ function test_ReplaceTextWithDictionary() {
         test_failed(arguments.callee.name)}   
 }
 
-function test_getTagsfromClass() {
+function test_ReplaceWithData_table() {
+    text = '{row} {col} {{key1}} {/col} {col} {{key2}} {/col} {/row}'
+    data = {
+            "key1": "Hello 1",
+            "key2": "World 1"
+        }
+    var ret = ReplaceWithData_table(text, data, numbering = 0, prefix = '{{', postfix = '}}')
+    if (ret == "<tr> <td> Hello 1 </td> <td> World 1 </td> </tr>") {
+        test_passed(arguments.callee.name + " 1")} 
+    else {
+        test_failed(arguments.callee.name + " 1")}   
+    
+        
+    text = '{num}';
+    numbering = 4;
+    var ret = ReplaceWithData_table(text, data, numbering, prefix = '{{', postfix = '}}')
+    if (ret == "4") {
+        test_passed(arguments.callee.name + " 2")} 
+    else {
+        test_failed(arguments.callee.name + " 2")}  
+}
+
+function test_GetTagsfromClass() {
 
     classList = ['Stadt', 'Land', 'Fluss', '[City]', '[Country]', '[River]'];
     TagList = ['City', 'Country', 'River'];
@@ -88,8 +110,15 @@ function test_getTagsfromClass() {
         test_failed(arguments.callee.name)}   
 }
 
-test_GetSumInfo()
-test_ReturnSubsetWithPrefix()
-test_flattenData();
-test_ReplaceTextWithDictionary();
-test_getTagsfromClass();
+var test_run = 0;
+test_GetSumInfo(); test_run +=1;
+test_ReturnSubsetWithPrefix(); test_run +=1;
+test_flattenData(); test_run +=1;
+test_ReplaceTextWithDictionary(); test_run +=1;
+test_ReplaceWithData_table(); test_run +=1;
+test_GetTagsfromClass(); test_run +=1;
+
+if (test_run == 6) {
+    test_passed(test_run + " test run")} 
+else {
+    test_failed("test run not complete")}  
