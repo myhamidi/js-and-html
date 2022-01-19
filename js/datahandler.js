@@ -45,11 +45,13 @@ function main_datahandler(Identification = "ID") {
         
         var dataSubset = RetDataSubSet(Identification); // Identification dependend on data set. Default
         
-        if (datahandler_divs[j].classList.contains("dh-table")) {
-            main_datahandler_table(datahandler_divs[j], dataSubset);} 
-        else {
-            // ReplaceDivContent(j, dataSubset);}
-            ReplaceDivContent(datahandler_divs[j], dataSubset)}
+        ReplaceDivContent(datahandler_divs[j], dataSubset);
+
+        // if (datahandler_divs[j].classList.contains("dh-table")) {
+        //     main_datahandler_table(datahandler_divs[j], dataSubset);} 
+        // else {
+        //     // ReplaceDivContent(j, dataSubset);}
+        //     ReplaceDivContent(datahandler_divs[j], dataSubset)}
     }
 }
 
@@ -80,6 +82,15 @@ function ReplaceDivContent(_div, dataSubset) {
      */
     var div_tags = getTagsfromClass(_div.classList);
     var fragment = ''; var i;
+    
+    // if (_div.classList.contains("dh-table")) {
+        var suminfo = GetSumInfo(_div.innerHTML);
+        var numbering = false;
+        if (_div.innerHTML.includes("{num}")) {
+            numbering = true;}
+        // delete
+        _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+suminfo.key+"}"+":"+suminfo.colStr+"}", 'g'), "")
+    // } 
 
     var datasubset_valid = [];
     if (div_tags.length == 0){
@@ -95,10 +106,24 @@ function ReplaceDivContent(_div, dataSubset) {
         }
     }
 
+    var sum = 0;
+    var nthCall = 0; 
     for (i = 0; i < datasubset_valid.length; i++) {
-        fragment += RetTextReplacedWithData(_div,datasubset_valid[i]);}
+        if (numbering) {nthCall = i+1}
+        if (suminfo.key != "") {sum += datasubset_valid[i][suminfo.key]}
 
-    _div.innerHTML = fragment;
+        fragment += RetTextReplacedWithData(_div,datasubset_valid[i],nthCall)}
+
+    if (suminfo.key != "") {
+        num_cols = _div.innerHTML.split("{col}").length - 1;
+        insert_col = parseInt(suminfo.colStr)-1; // repeat n-1 times
+        fragment += "<tr>" + "<td></td>".repeat(insert_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - insert_col - 1) + "</tr>" 
+    }
+
+    if (_div.classList.contains("dh-table")) {
+        _div.innerHTML  = "<table>" + fragment + "</table>";}
+        else {_div.innerHTML = fragment;}
+    
 };
 
 function GetSumInfo(_divInnerHTML) {
@@ -133,8 +158,8 @@ function main_datahandler_table(_div, dataSubset) {
     }
 
     // build inner html fragment (and calculate sum if applicable)
-    var sum = 0
-    var nth_row = 0
+    var sum = 0;
+    var nth_row = 0;
     for (i = 0; i < datasubset_valid.length; i++) {
             if (numbering) {nth_row = i+1}
             fragment += ReplaceWithData_table(_div.innerHTML,datasubset_valid[i], nth_row);
@@ -155,7 +180,7 @@ function main_datahandler_table(_div, dataSubset) {
 
 };
 
-function RetTextReplacedWithData (div, dataElement) {
+function RetTextReplacedWithData (div, dataElement, numbering) {
     /**
     * Returns text with dataElement replacement, dependent on div classes
     * 
@@ -164,8 +189,9 @@ function RetTextReplacedWithData (div, dataElement) {
     * AsTable: if true, return the data in form of table colums (to be inserted in one table row)
     */
     var ret = "";
-    if (div.classList.contains("datahandler-table")){
-        ret = ReplaceTextWithDictionary(div.innerHTML, dataElement, AsTable=True)}
+    if (div.classList.contains("dh-table")){
+        // ret = ReplaceTextWithDictionary(div.innerHTML, dataElement, AsTable=True)}
+        ret = ReplaceWithData_table(div.innerHTML, dataElement, numbering)}
     else {
         ret = ReplaceTextWithDictionary(div.innerHTML, dataElement)}
     return ret;
