@@ -18,36 +18,10 @@ var dataSubset =  flattenData(var_data);
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
 //on window load:
-function main_datahandler(Identification = "Global") {
+function main_datahandler() {
     for (j = 0; j < datahandler_divs.length; j++) {
-        
-        ReplaceDivContent(datahandler_divs[j], dataSubset);
-
-        // if (datahandler_divs[j].classList.contains("dh-table")) {
-        //     main_datahandler_table(datahandler_divs[j], dataSubset);} 
-        // else {
-        //     // ReplaceDivContent(j, dataSubset);}
-        //     ReplaceDivContent(datahandler_divs[j], dataSubset)}
-    }
+        ReplaceDivContent(datahandler_divs[j], dataSubset);}
 }
-
-// function RetDataSubSet(Identification = "ID") {
-//     /**
-//      * Returns data subset that is allocated to the id. If Identification ="" then all data is returned
-//      * If Identification  does not match to key in data then [] is returned.
-//      */
-//     var dataSubset = [];
-//     if (Identification == "Global") {
-//         dataSubset = flattenData(var_data)}
-//     if (Identification == "ID") {
-//         keys = Object.keys(var_data);
-//         for (k = 0; k<keys.length; k++) {
-//             if (datahandler_divs[j].id == keys[k]) {
-//                 dataSubset = var_data[keys[k]]}
-//         }
-//     }
-//      return dataSubset;
-// }
 
 function ReplaceDivContent(_div, dataSubset) {
     /**
@@ -57,42 +31,22 @@ function ReplaceDivContent(_div, dataSubset) {
      * dataSubset: Array of data that is used for replacement
      */
     var div_tags = getTagsfromClass(_div.classList);
+    var datasubset_valid = RetValidData(dataSubset, div_tags);
+    var PageInfo = GetPageInfo(_div);
     var fragment = ''; var i;
     
-    // if (_div.classList.contains("dh-table")) {
-        var suminfo = GetSumInfo(_div.innerHTML);
-        var numbering = false;
-        if (_div.innerHTML.includes("{num}")) {
-            numbering = true;}
-        // delete
-        _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+suminfo.key+"}"+":"+suminfo.colStr+"}", 'g'), "")
-    // } 
-
-    var datasubset_valid = [];
-    if (div_tags.length == 0){
-        for (i = 0; i < dataSubset.length; i++){
-            datasubset_valid.push(dataSubset[i]);}
-            // fragment += RetTextReplacedWithData(_div,dataSubset[i]);}
-    }
-    if (div_tags.length > 0){
-        for (i = 0; i < dataSubset.length; i++) {
-            if (dataSubset[i]["Tags"] == undefined) {continue}
-            if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
-                datasubset_valid.push(dataSubset[i]);}
-        }
-    }
-
     var sum = 0;
     var nthCall = 0; 
     for (i = 0; i < datasubset_valid.length; i++) {
-        if (numbering) {nthCall = i+1}
-        if (suminfo.key != "") {sum += datasubset_valid[i][suminfo.key]}
-
+        if (PageInfo.Numbering) {
+            nthCall = i+1}
+        if (PageInfo.SumKey != "") {
+            sum += datasubset_valid[i][PageInfo.SumKey]}
         fragment += RetTextReplacedWithData(_div,datasubset_valid[i],nthCall)}
 
-    if (suminfo.key != "") {
+    if (PageInfo.SumKey != "") {
         num_cols = _div.innerHTML.split("{col}").length - 1;
-        insert_col = parseInt(suminfo.colStr)-1; // repeat n-1 times
+        insert_col = parseInt(PageInfo.SumcolStr)-1; // repeat n-1 times
         fragment += "<tr>" + "<td></td>".repeat(insert_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - insert_col - 1) + "</tr>" 
     }
 
@@ -102,58 +56,34 @@ function ReplaceDivContent(_div, dataSubset) {
     
 };
 
-function GetSumInfo(_divInnerHTML) {
-    suminfo = {"key": "", "colStr": ""}; text = _divInnerHTML;
-    var idx1 = text.indexOf("{sum:{");
-    var idx2 = text.indexOf("}:", fromIndex = idx1);
-    suminfo.key = text.substring(idx1+6, idx2);
-    suminfo.colStr = text.substring(idx2+2, idx2+4);
-    return suminfo;
+function RetValidData(_data, div_tags) {
+    var dataSubset_valid = [];
+    if (div_tags.length == 0){
+        for (i = 0; i < _data.length; i++){
+            dataSubset_valid.push(_data[i]);}
+    }
+    if (div_tags.length > 0){
+        for (i = 0; i < _data.length; i++) {
+            if (_data[i]["Tags"] == undefined) {continue}
+            if (IsCorrectTagLogic(_data[i]["Tags"],div_tags)) {
+                dataSubset_valid.push(_data[i]);}
+        }
+    }
+    return dataSubset_valid;
 };
 
-function main_datahandler_table(_div, dataSubset) {
-    //j = nth_div;
-    var div_tags = getTagsfromClass(_div.classList);
-    var fragment = ''; var i;
-    
-    if (_div.classList.contains("dh-table")) {
-        var suminfo = GetSumInfo(_div.innerHTML);
-        var numbering = false;
-        if (_div.innerHTML.includes("{num}")) {
-            numbering = true;}
-        // delete
-        _div.innerHTML = _div.innerHTML.replace(new RegExp("{sum:{"+suminfo.key+"}"+":"+suminfo.colStr+"}", 'g'), "")
-    } 
-    
-    //identify relevant data subset
-    var datasubset_valid = []
-    for (i = 0; i < dataSubset.length; i++) {
-        if (dataSubset[i]["Tags"] == undefined) {continue}
-        if (IsCorrectTagLogic(dataSubset[i]["Tags"],div_tags)) {
-            datasubset_valid.push(dataSubset[i])}
-    }
-
-    // build inner html fragment (and calculate sum if applicable)
-    var sum = 0;
-    var nth_row = 0;
-    for (i = 0; i < datasubset_valid.length; i++) {
-            if (numbering) {nth_row = i+1}
-            fragment += ReplaceWithData_table(_div.innerHTML,datasubset_valid[i], nth_row);
-            // fragment += ReplaceWithData_table(_div,datasubset_valid[i], nth_row);
-            if (suminfo.key != "") {
-                // get sum from data
-                sum += datasubset_valid[i][suminfo.key]}
-        }
-
-    // if applicable, create sum row
-    if (suminfo.key != "") {
-        num_cols = _div.innerHTML.split("{col}").length - 1;
-        insert_col = parseInt(suminfo.colStr)-1; // repeat n-1 times
-        fragment += "<tr>" + "<td></td>".repeat(insert_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - insert_col - 1) + "</tr>" 
-    }
-
-    _div.innerHTML  = "<table>" + fragment + "</table>"
-
+function GetPageInfo(div) {
+    suminfo = {"SumKey": "", "SumcolStr": "", "PageInfo.Numbering": false}; 
+    text = div.innerHTML;
+    var idx1 = text.indexOf("{Xsum:{");
+    var idx2 = text.indexOf("}:", fromIndex = idx1);
+    suminfo.SumKey = text.substring(idx1+7, idx2);
+    suminfo.SumcolStr = text.substring(idx2+2, idx2+4);
+    if (text.includes("{num}")) {
+        suminfo.Numbering = true;}
+    // delete
+    div.innerHTML = div.innerHTML.replace(new RegExp("{Xsum:{"+suminfo.SumKey+"}"+":"+suminfo.SumcolStr+"}", 'g'), "")
+    return suminfo;
 };
 
 function RetTextReplacedWithData (div, dataElement, numbering) {
