@@ -12,38 +12,14 @@
 // ##############################################################################################################
 
 
-// main_datahandler
-    // RetDataSubSet
-        // flattenData -
-    // main_datahandler_table
-        // getTagsfromClass - 
-        // GetSumInfo -
-        // IsCorrectTagLogic
-            // ReturnSubsetWithPrefix - 
-        // ReplaceWithData_table
-        
-    // ReplaceDivContent
-        // getTagsfromClass - 
-        // IsCorrectTagLogic
-            // ReturnSubsetWithPrefix - 
-        // RetTextReplacedWithData
-            // ReplaceTextWithDictionary- 
-
-
-
 //parameters
 var var_data = Object.assign(data01);  // data link in html file
+var dataSubset =  flattenData(var_data);
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
-// var var_data = Object.assign(data01); 
-
 //on window load:
-function main_datahandler(Identification = "ID") {
-    
-    
+function main_datahandler(Identification = "Global") {
     for (j = 0; j < datahandler_divs.length; j++) {
-        
-        var dataSubset = RetDataSubSet(Identification); // Identification dependend on data set. Default
         
         ReplaceDivContent(datahandler_divs[j], dataSubset);
 
@@ -55,23 +31,23 @@ function main_datahandler(Identification = "ID") {
     }
 }
 
-function RetDataSubSet(Identification = "ID") {
-    /**
-     * Returns data subset that is allocated to the id. If Identification ="" then all data is returned
-     * If Identification  does not match to key in data then [] is returned.
-     */
-    var dataSubset = [];
-    if (Identification == "Global") {
-        dataSubset = flattenData(var_data)}
-    if (Identification == "ID") {
-        keys = Object.keys(var_data);
-        for (k = 0; k<keys.length; k++) {
-            if (datahandler_divs[j].id == keys[k]) {
-                dataSubset = var_data[keys[k]]}
-        }
-    }
-     return dataSubset;
-}
+// function RetDataSubSet(Identification = "ID") {
+//     /**
+//      * Returns data subset that is allocated to the id. If Identification ="" then all data is returned
+//      * If Identification  does not match to key in data then [] is returned.
+//      */
+//     var dataSubset = [];
+//     if (Identification == "Global") {
+//         dataSubset = flattenData(var_data)}
+//     if (Identification == "ID") {
+//         keys = Object.keys(var_data);
+//         for (k = 0; k<keys.length; k++) {
+//             if (datahandler_divs[j].id == keys[k]) {
+//                 dataSubset = var_data[keys[k]]}
+//         }
+//     }
+//      return dataSubset;
+// }
 
 function ReplaceDivContent(_div, dataSubset) {
     /**
