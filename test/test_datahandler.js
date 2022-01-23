@@ -12,11 +12,12 @@ function test_failed(fname) {
     div_elementJ.innerHTML += fname + '<font style="color:red"> failed </font> <br/>'
 }
 
-function test_GetSumInfo() {
-    input = '{row} {col} <a href="{{url}}">{{name}}</a> {/col} {col} {{value}} {/col} {/row} {sum:{value}:03}'
+function test_GetPageInfo() {
+    pseudoDiv = {};
+    pseudoDiv.innerHTML = '{row} {col} <a href="{{url}}">{{name}}</a> {/col} {col} {{value}} {/col} {/row} {Xsum:{value}:03}'
     test_info = {colStr: "03", key: "value"};
-    info = GetSumInfo(input);
-    if (test_info.colStr == info.colStr && test_info.key == info.key) {
+    info = GetPageInfo(pseudoDiv);
+    if (test_info.colStr == info.SumcolStr && test_info.key == info.SumKey) {
         test_passed(arguments.callee.name)} 
     else {
         test_failed(arguments.callee.name)}
@@ -33,34 +34,6 @@ function test_ReturnSubsetWithPrefix() {
         test_passed(arguments.callee.name)} 
     else {
         test_failed(arguments.callee.name)}   
-}
-
-
-function test_flattenData() {
-    var dataA = {
-        "Alpha":
-            [
-                {"stadt": "Munich", "Land": "BY", "Fluss": "Isar",},
-                {"stadt": "Frankfurt", "Land": "HE", "Fluss": "Main",},
-            ],
-        "Beta":
-            [
-                {"stadt": "New York", "Land": "USA", "Fluss": "Hudson",},
-            ],
-    };
-
-    var dataB = [
-                {"stadt": "Munich", "Land": "BY", "Fluss": "Isar",},
-                {"stadt": "Frankfurt", "Land": "HE", "Fluss": "Main",},
-                {"stadt": "New York", "Land": "USA", "Fluss": "Hudson",}
-        ];
-    var dataA_flat = flattenData(dataA);
-
-    
-    if (IsEqual_ListofObjects(dataA_flat, dataB)) {
-        test_passed(arguments.callee.name)} 
-    else {
-        test_failed(arguments.callee.name)}         
 }
 
 function test_ReplaceTextWithDictionary() {
@@ -110,15 +83,38 @@ function test_GetTagsfromClass() {
         test_failed(arguments.callee.name)}   
 }
 
-var test_run = 0;
-test_GetSumInfo(); test_run +=1;
-test_ReturnSubsetWithPrefix(); test_run +=1;
-test_flattenData(); test_run +=1;
-test_ReplaceTextWithDictionary(); test_run +=1;
-test_ReplaceWithData_table(); test_run +=1;
-test_GetTagsfromClass(); test_run +=1;
+function test_flattenData() {
+    var dataA = {
+        "Alpha":
+            [
+                {"stadt": "Munich", "Land": "BY", "Fluss": "Isar",},
+                {"stadt": "Frankfurt", "Land": "HE", "Fluss": "Main",},
+            ],
+        "Beta":
+            [
+                {"stadt": "New York", "Land": "USA", "Fluss": "Hudson",},
+            ],
+    };
 
-if (test_run == 6) {
-    test_passed(test_run + " test run")} 
-else {
-    test_failed("test run not complete")}  
+    var dataB = [
+                {"stadt": "Munich", "Land": "BY", "Fluss": "Isar",},
+                {"stadt": "Frankfurt", "Land": "HE", "Fluss": "Main",},
+                {"stadt": "New York", "Land": "USA", "Fluss": "Hudson",}
+        ];
+    var dataA_flat = flattenData(dataA);
+
+    
+    if (IsEqual_ListofObjects(dataA_flat, dataB)) {
+        test_passed(arguments.callee.name)} 
+    else {
+        test_failed(arguments.callee.name)}         
+}
+
+test_GetPageInfo(); 
+test_ReturnSubsetWithPrefix(); 
+test_ReplaceTextWithDictionary(); 
+test_ReplaceWithData_table(); 
+test_GetTagsfromClass(); 
+test_flattenData(); 
+
+div_elementJ.innerHTML += 'test run complete'

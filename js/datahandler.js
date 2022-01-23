@@ -14,35 +14,37 @@
 
 //parameters
 var var_data = Object.assign(data01);  // data link in html file
-var dataSubset =  flattenData(var_data);
+var dataF =  flattenData(var_data);
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
 //on window load:
 function main_datahandler() {
+    /**
+     * main function that needs to eb loader on windows load
+     */
     for (j = 0; j < datahandler_divs.length; j++) {
-        ReplaceDivContent(datahandler_divs[j], dataSubset);}
+        ReplaceDivContent(datahandler_divs[j], dataF);}
 }
 
-function ReplaceDivContent(_div, dataSubset) {
+function ReplaceDivContent(_div, dataF) {
     /**
-     * Replaces div element with data Array. When no Tags are defined in html then all data is placed in html
+     * Replaces div element with data array based on the tags defined in the html div. 
+     * When no Tags are defined in html then all data is placed in html
      * 
-     * _div: div element where Replacement will happen
-     * dataSubset: Array of data that is used for replacement
      */
     var div_tags = getTagsfromClass(_div.classList);
-    var datasubset_valid = RetValidData(dataSubset, div_tags);
+    var dataF_valid = RetValidData(dataF, div_tags);
     var PageInfo = GetPageInfo(_div);
     var fragment = ''; var i;
     
     var sum = 0;
     var nthCall = 0; 
-    for (i = 0; i < datasubset_valid.length; i++) {
+    for (i = 0; i < dataF_valid.length; i++) {
         if (PageInfo.Numbering) {
             nthCall = i+1}
         if (PageInfo.SumKey != "") {
-            sum += datasubset_valid[i][PageInfo.SumKey]}
-        fragment += RetTextReplacedWithData(_div,datasubset_valid[i],nthCall)}
+            sum += dataF_valid[i][PageInfo.SumKey]}
+        fragment += RetTextReplacedWithData(_div,dataF_valid[i],nthCall)}
 
     if (PageInfo.SumKey != "") {
         num_cols = _div.innerHTML.split("{col}").length - 1;
@@ -57,22 +59,33 @@ function ReplaceDivContent(_div, dataSubset) {
 };
 
 function RetValidData(_data, div_tags) {
-    var dataSubset_valid = [];
+    /**
+    * Returns the subset of data elements based on the tags defined in the html div
+    * 
+    */
+    var dataF_valid = [];
     if (div_tags.length == 0){
         for (i = 0; i < _data.length; i++){
-            dataSubset_valid.push(_data[i]);}
+            dataF_valid.push(_data[i]);}
     }
     if (div_tags.length > 0){
         for (i = 0; i < _data.length; i++) {
             if (_data[i]["Tags"] == undefined) {continue}
             if (IsCorrectTagLogic(_data[i]["Tags"],div_tags)) {
-                dataSubset_valid.push(_data[i]);}
+                dataF_valid.push(_data[i]);}
         }
     }
-    return dataSubset_valid;
+    return dataF_valid;
 };
 
 function GetPageInfo(div) {
+    /**
+    * Returns text with dataElement replacement, dependent on div classes
+    * 
+    * text: text that contains replacement pre- and postfix with keys that will be replaced by dataElement
+    * dataElement: data in form of a dictionary
+    * AsTable: if true, return the data in form of table colums (to be inserted in one table row)
+    */
     suminfo = {"SumKey": "", "SumcolStr": "", "PageInfo.Numbering": false}; 
     text = div.innerHTML;
     var idx1 = text.indexOf("{Xsum:{");
@@ -151,8 +164,11 @@ function getDOM_Prpperties(DOM_objects, DOM_Property) {
     return array;
 };
 
-//Unit Test
 function getTagsfromClass(classlist) {
+    /**
+     * Returns the tags as list defiend in the divs class property.
+     * 
+     */
     var Tag_list = [];
     for (var i = 0;i< classlist.length;i++) {
         if (classlist[i].includes("[")) {
@@ -200,7 +216,6 @@ function ReturnSubsetWithPrefix(array, prefix = "", removePrefix = true, flip = 
         return tmp}
 }
 
-//Unit Test
 function flattenData(dataA = []) {
     var keys = Object.keys(dataA);
     var tmp = [];
