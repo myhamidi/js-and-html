@@ -18,15 +18,15 @@ var dataF =  flattenData(var_data);
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
 //on window load:
-function main_datahandler() {
+function main_datahandler(loadSize = 9999) {
     /**
      * main function that needs to eb loader on windows load
      */
     for (j = 0; j < datahandler_divs.length; j++) {
-        ReplaceDivContent(datahandler_divs[j], dataF);}
+        ReplaceDivContent(datahandler_divs[j], dataF, loadSize);}
 }
 
-function ReplaceDivContent(_div, dataF) {
+function ReplaceDivContent(_div, dataF, loadSize) {
     /**
      * Replaces div element with data array based on the tags defined in the html div. 
      * When no Tags are defined in html then all data is placed in html
@@ -37,9 +37,14 @@ function ReplaceDivContent(_div, dataF) {
     var PageInfo = GetPageInfo(_div);
     var fragment = ''; var i;
     
-    var sum = 0;
-    var nthCall = 0; 
-    for (i = 0; i < dataF_valid.length; i++) {
+    var sum = 0; // optional, if sum shall be counted
+    var nthCall = 0;  // optional, if items shall be numbered
+    var ubound = dataF_valid.length; //optional if number of elements shall be limited
+    if (dataF_valid.length>loadSize) {
+        ubound = loadSize;
+    }
+
+    for (i = 0; i < ubound; i++) {
         if (PageInfo.Numbering) {
             nthCall = i+1}
         if (PageInfo.SumKey != "") {
@@ -51,6 +56,12 @@ function ReplaceDivContent(_div, dataF) {
         insert_col = parseInt(PageInfo.SumcolStr)-1; // repeat n-1 times
         fragment += "<tr>" + "<td></td>".repeat(insert_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - insert_col - 1) + "</tr>" 
     }
+    
+    if (dataF_valid.length>loadSize) {
+        strL = "<br/><button onclick='myFunction(";
+        strR = ")'>Click me</button>"
+        strM = '"' + _div.id + '"'
+        fragment += strL + strM + strR}
 
     if (_div.classList.contains("dh-table")) {
         _div.innerHTML  = "<table>" + fragment + "</table>";}
@@ -89,9 +100,12 @@ function GetPageInfo(div) {
     suminfo = {"SumKey": "", "SumcolStr": "", "PageInfo.Numbering": false}; 
     text = div.innerHTML;
     var idx1 = text.indexOf("{Xsum:{");
-    var idx2 = text.indexOf("}:", fromIndex = idx1);
-    suminfo.SumKey = text.substring(idx1+7, idx2);
-    suminfo.SumcolStr = text.substring(idx2+2, idx2+4);
+    if (idx1 > 0) {
+        var idx2 = text.indexOf("}:", fromIndex = idx1);
+        suminfo.SumKey = text.substring(idx1+7, idx2);
+        suminfo.SumcolStr = text.substring(idx2+2, idx2+4);
+    }
+
     if (text.includes("{num}")) {
         suminfo.Numbering = true;}
     // delete
@@ -112,12 +126,12 @@ function RetTextReplacedWithData (div, dataElement, numbering) {
         // ret = ReplaceTextWithDictionary(div.innerHTML, dataElement, AsTable=True)}
         ret = ReplaceWithData_table(div.innerHTML, dataElement, numbering)}
     else {
-        ret = ReplaceTextWithDictionary(div.innerHTML, dataElement)}
+        ret = ReplaceTextWithDictionary(div.innerHTML, dataElement, numbering)}
     return ret;
 };
 
 // Unit Test
-function ReplaceTextWithDictionary(text, dataElement, AsTable = false, prefix = "{{", postfix = "}}") {
+function ReplaceTextWithDictionary(text, dataElement, numbering, AsTable = false, prefix = "{{", postfix = "}}") {
     /**
      * Returns text with data replacement
      * 
@@ -131,7 +145,8 @@ function ReplaceTextWithDictionary(text, dataElement, AsTable = false, prefix = 
         if (AsTable) {            
             ret = ret.replace(new RegExp(prefix + keys[i] + postfix, 'g'), "<td>"+dataElement[keys[i]]+"</td>");}
         else {
-            ret = ret.replace(new RegExp(prefix + keys[i] + postfix, 'g'), dataElement[keys[i]]);}
+            ret = ret.replace(new RegExp(prefix + keys[i] + postfix, 'g'), dataElement[keys[i]]);
+            ret = ret.replace(new RegExp("{num}", 'g'), numbering);}
     }
     return ret;
 }
@@ -226,4 +241,11 @@ function flattenData(dataA = []) {
         }
      }
     return tmp;
+}
+
+function myFunction(divID) {
+    for (i = 0; i<datahandler_divs.length;i++) {
+        if (datahandler_divs[i].id == divID) {
+            datahandler_divs[i].innerHTML += "Hallo";}
+    }
 }
