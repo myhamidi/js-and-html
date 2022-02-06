@@ -8,7 +8,11 @@
 </head>
 
 <body>
-    <div id="id" class="datahandler-root">
+    <div id="id" class="datahandler-root dh-10">
+        {num} {{Name}}<br/>
+    </div>
+
+    <div id="id2" class="datahandler-root dh-20">
         {num} {{Name}}<br/>
     </div>
 </body>
@@ -16,6 +20,6 @@
 <script src="countries.js"></script>
 <script src="../js/datahandler.js"></script>
 <script>
-window.onload = function () {main_datahandler(50); } 
+window.onload = function () {main_datahandler(); } 
 </script>
 </html>

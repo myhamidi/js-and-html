@@ -12,27 +12,30 @@
 // ##############################################################################################################
 
 
-//parameters
+//parameters    
 var var_data = Object.assign(data01);  // data link in html file
 var dataF =  flattenData(var_data);
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
 
 //on window load:
-function main_datahandler(loadSize = 9999) {
+function main_datahandler() {
     /**
      * main function that needs to eb loader on windows load
      */
+    loadJS("../js/GetGlobal.js", true);
+
     for (j = 0; j < datahandler_divs.length; j++) {
-        ReplaceDivContent(datahandler_divs[j], dataF, loadSize);}
+        ReplaceDivContent(datahandler_divs[j], dataF);}
 }
 
-function ReplaceDivContent(_div, dataF, loadSize) {
+function ReplaceDivContent(_div, dataF) {
     /**
      * Replaces div element with data array based on the tags defined in the html div. 
      * When no Tags are defined in html then all data is placed in html
      * 
      */
     var div_tags = getTagsfromClass(_div.classList);
+    var LoadSize = getLoadSize(_div.classList);
     var dataF_valid = RetValidData(dataF, div_tags);
     var PageInfo = GetPageInfo(_div);
     var fragment = ''; var i;
@@ -40,8 +43,8 @@ function ReplaceDivContent(_div, dataF, loadSize) {
     var sum = 0; // optional, if sum shall be counted
     var nthCall = 0;  // optional, if items shall be numbered
     var ubound = dataF_valid.length; //optional if number of elements shall be limited
-    if (dataF_valid.length>loadSize) {
-        ubound = loadSize;
+    if (dataF_valid.length>LoadSize) {
+        ubound = LoadSize;
     }
 
     for (i = 0; i < ubound; i++) {
@@ -57,11 +60,13 @@ function ReplaceDivContent(_div, dataF, loadSize) {
         fragment += "<tr>" + "<td></td>".repeat(insert_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - insert_col - 1) + "</tr>" 
     }
     
-    if (dataF_valid.length>loadSize) {
+    if (dataF_valid.length>LoadSize) {
         strL = "<br/><button onclick='myFunction(";
-        strR = ")'>Click me</button>"
-        strM = '"' + _div.id + '"'
-        fragment += strL + strM + strR}
+        strR = ")'>Click me</button>";
+        strM = '"' + _div.id + '"';
+        fragment += strL + strM + strR;
+        fragment += ReturnAsComment("Loaded Items:" + String(LoadSize))    
+    }
 
     if (_div.classList.contains("dh-table")) {
         _div.innerHTML  = "<table>" + fragment + "</table>";}
@@ -193,6 +198,19 @@ function getTagsfromClass(classlist) {
     return Tag_list;
 };
 
+function getLoadSize(classlist) {
+    /**
+     * Returns the tags as list defiend in the divs class property.
+     * 
+     */
+    var Tag_list = [];
+    for (var i = 0;i< classlist.length;i++) {
+        if (classlist[i].startsWith("dh-")) {
+            return classlist[i].replace("dh-","");
+        }
+    }
+};
+
 function IsCorrectTagLogic(Tags_Dataelement, Tags_div) {
     if (Tags_div.length == 0) {return true}
     Taglist_OR = ReturnSubsetWithPrefix(Tags_div, "AND_", true, true)
@@ -243,9 +261,44 @@ function flattenData(dataA = []) {
     return tmp;
 }
 
-function myFunction(divID) {
-    for (i = 0; i<datahandler_divs.length;i++) {
-        if (datahandler_divs[i].id == divID) {
-            datahandler_divs[i].innerHTML += "Hallo";}
-    }
+function ReturnAsComment(text) {
+    return "<!--" + text + "-->"
 }
+
+function GetComments(text) {
+    var CommentList = []; var comment = ""; var idx1 = 0; var idx2 = 0;
+    
+    for (var i= 0;i<100;i++) {
+        idx1 = text.indexOf("<!--");
+        if (idx1 > 0) {
+            idx2 = text.indexOf("-->", fromIndex = idx1);
+            comment = text.substring(idx1+4, idx2)
+            CommentList.push(comment);
+            text = text.replace(new RegExp("<!--" + comment + "-->", 'g'), "")}
+    }
+    return CommentList;
+
+}
+
+
+
+function loadJS(FILE_URL, async = true) {
+    let scriptEle = document.createElement("script");
+  
+    scriptEle.setAttribute("src", FILE_URL);
+    scriptEle.setAttribute("type", "text/javascript");
+    scriptEle.setAttribute("async", async);
+  
+    document.body.appendChild(scriptEle);
+  
+    // success event 
+    scriptEle.addEventListener("load", () => {
+      console.log("File loaded")
+    });
+     // error event
+    scriptEle.addEventListener("error", (ev) => {
+      console.log("Error on loading file", ev);
+    });
+  }
+  
+ 

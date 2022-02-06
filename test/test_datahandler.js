@@ -36,18 +36,51 @@ function test_ReturnSubsetWithPrefix() {
         test_failed(arguments.callee.name)}   
 }
 
+function test_getLoadSize() {
+    ClassList1  = ["alpha", "dh-10"];
+    ClassList2  = ["alpha", "dh-50"];
+    
+    if (getLoadSize(ClassList1) == 10 && getLoadSize(ClassList2) == 50) {
+        test_passed(arguments.callee.name)} 
+    else {
+        test_failed(arguments.callee.name)}   
+}
+
+function test_ReturnAsComment() {
+    text = "This is my comment";
+    test = "<!--This is my comment-->";
+
+    if (ReturnAsComment(text) == test) {
+        test_passed(arguments.callee.name)} 
+    else {
+        test_failed(arguments.callee.name)}   
+}
+
+function test_GetComments() {
+    text = "This is some html <!--This is my first comment--> This is some html <!--This is my second comment-->";
+    test0 = "This is my first comment", test1 = "This is my second comment"
+
+    ret = GetComments(text);
+    if (ret[0] == test0 && ret[1] == test1) {
+        test_passed(arguments.callee.name)} 
+    else {
+        test_failed(arguments.callee.name)}   
+}
+
 function test_ReplaceTextWithDictionary() {
     text = '{{key1}} and {{key2}}'
     data = {
             "key1": "Hello 1",
             "key2": "World 1"
         }
-    var ret = ReplaceTextWithDictionary(text, data, AsTable = false, prefix = '{{', postfix = '}}')
+    var ret = ReplaceTextWithDictionary(text, data, numbering = -1, AsTable = false, prefix = '{{', postfix = '}}')
     if (ret == "Hello 1 and World 1") {
         test_passed(arguments.callee.name)} 
     else {
         test_failed(arguments.callee.name)}   
 }
+
+
 
 function test_ReplaceWithData_table() {
     text = '{row} {col} {{key1}} {/col} {col} {{key2}} {/col} {/row}'
@@ -112,6 +145,9 @@ function test_flattenData() {
 
 test_GetPageInfo(); 
 test_ReturnSubsetWithPrefix(); 
+test_getLoadSize();
+test_ReturnAsComment();
+test_GetComments();
 test_ReplaceTextWithDictionary(); 
 test_ReplaceWithData_table(); 
 test_GetTagsfromClass(); 
