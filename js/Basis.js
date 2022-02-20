@@ -30,7 +30,7 @@ function RetStringHTMLButton(Text, onclickFunction, parameterString) {
     strL1 = '<button onclick="';
     strL2 = onclickFunction+"(";
     strM = '&quot;' + parameterString + '&quot;';  // strM = '"' + parameterString + '"''; does lead to error
-    strR = ')">Click me</button>';
+    strR = ')">' + Text + '</button>';
     //'<button onclick="myFunction("id")">Click me</button>'; return an error "Unexpectedenfof file due to the double usage of " marks
     //'<button onclick="myFunction(&quot;id&quot;)">Click me</button>' is correct
     return strL1 + strL2 + strM + strR;

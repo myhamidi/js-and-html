@@ -84,14 +84,13 @@ function ReplaceDivContent(nth_div, _div, dataF) {
      * 
      */
     var div_tags = getTagsfromClass(_div.classList);
-    var LoadSize = getLoadSize(_div.classList);
     var dataF_valid = RetValidData(dataF, div_tags);
+    var LoadSize = getLoadSize(_div.classList,dataF_valid.length);
     var DivInfo = GetPageInfo(_div);
     var fragment = ''; var i;
     
     var sum = 0; // optional, if sum shall be counted
     var nthCall = 0;  // optional, if items shall be numbered
-    var lbound = DivInfo.LoadedItems;
     var ubound = Math.min(DivInfo.LoadedItems + LoadSize, dataF_valid.length) ; 
 
     for (i = 0; i < ubound; i++) {
@@ -108,7 +107,7 @@ function ReplaceDivContent(nth_div, _div, dataF) {
     }
     
     if (dataF_valid.length>ubound) {
-        fragment += "<br>" + RetStringHTMLButton("", "myFunction", _div.id);
+        fragment += "<br>" + RetStringHTMLButton("Next (Showing " + String(ubound) + " of " + String(dataF_valid.length) + ")", "myFunction", _div.id);
         fragment += ReturnAsComment("Loaded Items:" + String(ubound) + "!")    
     }
 
@@ -263,18 +262,18 @@ function getTagsfromClass(classlist) {
     return Tag_list;
 };
 
-function getLoadSize(classlist) {
+function getLoadSize(classlist, substituteValue) {
     /**
-     * Returns the tags as list defiend in the divs class property.
+     * Returns LoadSize based onclass definition(dh-20). If no definition was done, returns substituteValue
      * 
      */
-    var Tag_list = [];
     for (var i = 0;i< classlist.length;i++) {
-        if (classlist[i].startsWith("dh-")) {
-            var ret = classlist[i].replace("dh-","");
+        if (classlist[i].startsWith("dh-Load")) {
+            var ret = classlist[i].replace("dh-Load","");
             return parseInt(ret)
         }
     }
+    return substituteValue;
 };
 
 function IsCorrectTagLogic(Tags_Dataelement, Tags_div) {
