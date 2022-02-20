@@ -12,23 +12,72 @@
 // ##############################################################################################################
 
 
-//parameters    
-var var_data = Object.assign(data01);  // data link in html file
-var dataF =  flattenData(var_data);
+//parameters 
+var dataRaw_ = Object.assign(data01);  var var_data =  flattenData(dataRaw_);
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
+var var_divs_inner = RetInnerHTML(); DelInnerHTML();
+// load js files
+var scripts_ = document.getElementsByTagName("script");
+var src_ = scripts_[scripts_.length-1].src;
+var jsPath_ = RetStringBetween(src_,"file:///", "datahandler.js");
+loadJS(jsPath_ + "GetGlobal.js", true);
+loadJS(jsPath_ + "Basis.js", true);   
 
 //on window load:
 function main_datahandler() {
     /**
-     * main function that needs to eb loader on windows load
+     * main function that needs to be loader on windows load
      */
-    loadJS("../js/GetGlobal.js", true);
-
     for (j = 0; j < datahandler_divs.length; j++) {
-        ReplaceDivContent(datahandler_divs[j], dataF);}
+        ReplaceDivContent(j, datahandler_divs[j], var_data);}
 }
 
-function ReplaceDivContent(_div, dataF) {
+function RetInnerHTML() {
+    ret = [];
+    for (i = 0; i < datahandler_divs.length; i++) {
+        ret[i] = datahandler_divs[i].innerHTML;
+    }
+    return ret;
+}
+
+function DelInnerHTML() {
+    for (i = 0; i < datahandler_divs.length; i++) {
+        datahandler_divs[i].innerHTML = "";
+    }
+}
+
+function RetStringBetween(text, fromStr, toStr ) {
+    /**
+     * Returns the String between two  strings.
+     * 
+     */
+     var idx1 = text.indexOf(fromStr);
+     if (idx1 > -1) {
+         var idx2 = text.indexOf(toStr, fromIndex = idx1);
+         return text.substring(idx1+fromStr.length, idx2);
+     }
+}
+
+function loadJS(FILE_URL, async = true) {
+    let scriptEle = document.createElement("script");
+  
+    scriptEle.setAttribute("src", FILE_URL);
+    scriptEle.setAttribute("type", "text/javascript");
+    scriptEle.setAttribute("async", async);
+  
+    document.body.appendChild(scriptEle);
+  
+    // success event 
+    scriptEle.addEventListener("load", () => {
+      console.log("File loaded")
+    });
+     // error event
+    scriptEle.addEventListener("error", (ev) => {
+      console.log("Error on loading file", ev);
+    });
+  }
+
+function ReplaceDivContent(nth_div, _div, dataF) {
     /**
      * Replaces div element with data array based on the tags defined in the html div. 
      * When no Tags are defined in html then all data is placed in html
@@ -37,42 +86,51 @@ function ReplaceDivContent(_div, dataF) {
     var div_tags = getTagsfromClass(_div.classList);
     var LoadSize = getLoadSize(_div.classList);
     var dataF_valid = RetValidData(dataF, div_tags);
-    var PageInfo = GetPageInfo(_div);
+    var DivInfo = GetPageInfo(_div);
     var fragment = ''; var i;
     
     var sum = 0; // optional, if sum shall be counted
     var nthCall = 0;  // optional, if items shall be numbered
-    var ubound = dataF_valid.length; //optional if number of elements shall be limited
-    if (dataF_valid.length>LoadSize) {
-        ubound = LoadSize;
-    }
+    var lbound = DivInfo.LoadedItems;
+    var ubound = Math.min(DivInfo.LoadedItems + LoadSize, dataF_valid.length) ; 
 
     for (i = 0; i < ubound; i++) {
-        if (PageInfo.Numbering) {
+        if (DivInfo.Numbering) {
             nthCall = i+1}
-        if (PageInfo.SumKey != "") {
-            sum += dataF_valid[i][PageInfo.SumKey]}
-        fragment += RetTextReplacedWithData(_div,dataF_valid[i],nthCall)}
+        if (DivInfo.SumKey != "") {
+            sum += dataF_valid[i][DivInfo.SumKey]}
+        fragment += RetTextReplacedWithData(var_divs_inner[nth_div], _div,dataF_valid[i],nthCall)}
 
-    if (PageInfo.SumKey != "") {
+    if (DivInfo.SumKey != "") {
         num_cols = _div.innerHTML.split("{col}").length - 1;
-        insert_col = parseInt(PageInfo.SumcolStr)-1; // repeat n-1 times
+        insert_col = parseInt(DivInfo.SumcolStr)-1; // repeat n-1 times
         fragment += "<tr>" + "<td></td>".repeat(insert_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - insert_col - 1) + "</tr>" 
     }
     
-    if (dataF_valid.length>LoadSize) {
-        strL = "<br/><button onclick='myFunction(";
-        strR = ")'>Click me</button>";
-        strM = '"' + _div.id + '"';
-        fragment += strL + strM + strR;
-        fragment += ReturnAsComment("Loaded Items:" + String(LoadSize))    
+    if (dataF_valid.length>ubound) {
+        fragment += "<br>" + RetStringHTMLButton("", "myFunction", _div.id);
+        fragment += ReturnAsComment("Loaded Items:" + String(ubound) + "!")    
     }
 
     if (_div.classList.contains("dh-table")) {
         _div.innerHTML  = "<table>" + fragment + "</table>";}
-        else {_div.innerHTML = fragment;}
+    else {
+        _div.innerHTML = fragment;}
     
 };
+
+
+function RetAnzahlLoadedItems(div) {
+    comments = GetComments(div.innerHTML);
+    for (var i = 0; i<comments.length; i++)
+        {
+            if (comments[i].startsWith("Loaded Items:")) {
+                var retStr = RetStringBetween(comments[i], "Loaded Items:","!");
+                return parseInt(retStr);
+            }
+        }
+    return 0;
+}
 
 function RetValidData(_data, div_tags) {
     /**
@@ -102,8 +160,15 @@ function GetPageInfo(div) {
     * dataElement: data in form of a dictionary
     * AsTable: if true, return the data in form of table colums (to be inserted in one table row)
     */
-    suminfo = {"SumKey": "", "SumcolStr": "", "PageInfo.Numbering": false}; 
+    suminfo = {
+        "LoadedItems": 0, // Number of data items currently loaded in the div
+        "SumKey": "", // If table with sum was used, sumkey is the key that shall be summed up at the end of table
+        "SumcolStr": "", //
+        "PageInfo.Numbering": false}; 
     text = div.innerHTML;
+
+    // Loadeditems
+    suminfo.LoadedItems = RetAnzahlLoadedItems(div);
     var idx1 = text.indexOf("{Xsum:{");
     if (idx1 > 0) {
         var idx2 = text.indexOf("}:", fromIndex = idx1);
@@ -118,7 +183,7 @@ function GetPageInfo(div) {
     return suminfo;
 };
 
-function RetTextReplacedWithData (div, dataElement, numbering) {
+function RetTextReplacedWithData (divInner, div, dataElement, numbering) {
     /**
     * Returns text with dataElement replacement, dependent on div classes
     * 
@@ -129,9 +194,9 @@ function RetTextReplacedWithData (div, dataElement, numbering) {
     var ret = "";
     if (div.classList.contains("dh-table")){
         // ret = ReplaceTextWithDictionary(div.innerHTML, dataElement, AsTable=True)}
-        ret = ReplaceWithData_table(div.innerHTML, dataElement, numbering)}
+        ret = ReplaceWithData_table(divInner, dataElement, numbering)}
     else {
-        ret = ReplaceTextWithDictionary(div.innerHTML, dataElement, numbering)}
+        ret = ReplaceTextWithDictionary(divInner, dataElement, numbering)}
     return ret;
 };
 
@@ -206,7 +271,8 @@ function getLoadSize(classlist) {
     var Tag_list = [];
     for (var i = 0;i< classlist.length;i++) {
         if (classlist[i].startsWith("dh-")) {
-            return classlist[i].replace("dh-","");
+            var ret = classlist[i].replace("dh-","");
+            return parseInt(ret)
         }
     }
 };
@@ -281,24 +347,8 @@ function GetComments(text) {
 }
 
 
-
-function loadJS(FILE_URL, async = true) {
-    let scriptEle = document.createElement("script");
-  
-    scriptEle.setAttribute("src", FILE_URL);
-    scriptEle.setAttribute("type", "text/javascript");
-    scriptEle.setAttribute("async", async);
-  
-    document.body.appendChild(scriptEle);
-  
-    // success event 
-    scriptEle.addEventListener("load", () => {
-      console.log("File loaded")
-    });
-     // error event
-    scriptEle.addEventListener("error", (ev) => {
-      console.log("Error on loading file", ev);
-    });
-  }
   
  
+
+  // var loc = window.location.pathname;
+// var dir = loc.substring(0, loc.lastIndexOf('/'));
