@@ -86,7 +86,7 @@ function ReplaceDivContent(nth_div, _div, dataF) {
     var div_tags = getTagsfromClass(_div.classList);
     var dataF_valid = RetValidData(dataF, div_tags);
     var LoadSize = getLoadSize(_div.classList,dataF_valid.length);
-    var DivInfo = GetPageInfo(_div);
+    var DivInfo = GetPageInfo(nth_div, _div);
     var fragment = ''; var i;
     
     var sum = 0; // optional, if sum shall be counted
@@ -101,7 +101,7 @@ function ReplaceDivContent(nth_div, _div, dataF) {
         fragment += RetTextReplacedWithData(var_divs_inner[nth_div], _div,dataF_valid[i],nthCall)}
 
     if (DivInfo.SumKey != "") {
-        num_cols = _div.innerHTML.split("{col}").length - 1;
+        num_cols = var_divs_inner[nth_div].split("{col}").length - 1;
         insert_col = parseInt(DivInfo.SumcolStr)-1; // repeat n-1 times
         fragment += "<tr>" + "<td></td>".repeat(insert_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - insert_col - 1) + "</tr>" 
     }
@@ -151,7 +151,7 @@ function RetValidData(_data, div_tags) {
     return dataF_valid;
 };
 
-function GetPageInfo(div) {
+function GetPageInfo(j, div) {
     /**
     * Returns text with dataElement replacement, dependent on div classes
     * 
@@ -164,7 +164,7 @@ function GetPageInfo(div) {
         "SumKey": "", // If table with sum was used, sumkey is the key that shall be summed up at the end of table
         "SumcolStr": "", //
         "PageInfo.Numbering": false}; 
-    text = div.innerHTML;
+    text = var_divs_inner[j];
 
     // Loadeditems
     suminfo.LoadedItems = RetAnzahlLoadedItems(div);
