@@ -19,23 +19,30 @@
     <div id="test result js"><b>Test Results js</b></br></div>
     <div id="test result html js"><b>Test Results html js</b></br></div>
     <div id="test result Basis js"><b>Test Results Basis js</b></br></div>
-    
+    <!-- Get Page Info-->
+    <div id="test GetPageInfo Minimal" class="datahandler-root dh-table"><b>Dummy GetPageInfo</b></br>
+    {row}
+        {col} <a href="{{url}}">{{name}}</a> {/col}
+     {/row}
+    </div>
 </body>
 
 <script src="js/data-example.js"></script>
 <script src="js/datahandler.js"></script>
 <script src="js/Basis.js"></script>
-<script src="test/test_functions.js"></script>
-<script src="test/test_Basis.js"></script>
-<script src="test/test_datahandler.js"></script>
-<script src="test/test_datahandler_example.js"></script>
 
 <script>
 window.onload = function () {
-        main_datahandler(Identification = "Global"); 
+        main_datahandler(); 
         //sidebar_main();
     } 
 //ReplaceDivContent(document.getElementById("Dokumente"), dataSubset = var_data["Dokumente"]); //to be repalced with main
 //test_ReplaceDivContent(div_id = "Dokumente");
 </script>
+<script src="test/test_functions.js"></script>
+<script src="test/test_Basis.js"></script>
+<script src="test/test_datahandler.js"></script>
+<script src="test/test_datahandler_example.js"></script>
+
+
 </html>

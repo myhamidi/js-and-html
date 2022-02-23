@@ -46,3 +46,27 @@ function RetHTMLremovedBotton(innerHTML) {
         // 
     }
 }
+
+function RetInnerHTML(divs) {
+     /**
+     * Returns the InnerHTML of the divs. divs must be an HTML Colletion
+     * 
+     */  
+
+    ret = [];
+    for (i = 0; i < divs.length; i++) {
+        ret[i] = divs[i].innerHTML;
+    }
+    return ret;
+}
+
+function DelInnerHTML(divs) {
+    /**
+     * Deletes the InnerHTML of the divs. divs must be an HTML Colletion
+     * 
+     */ 
+
+    for (i = 0; i < divs.length; i++) {
+        divs[i].innerHTML = "";
+    }
+}

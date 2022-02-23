@@ -12,39 +12,35 @@
 // ##############################################################################################################
 
 
-//parameters 
-var dataRaw_ = Object.assign(data01);  var var_data =  flattenData(dataRaw_);
-var datahandler_divs = document.getElementsByClassName("datahandler-root");
-var var_divs_inner = RetInnerHTML(); DelInnerHTML();
-// load js files
+// load js files (scripts of js files are loaded with nextfunction call, i. e. main )
 var scripts_ = document.getElementsByTagName("script");
 var src_ = scripts_[scripts_.length-1].src;
 var jsPath_ = RetStringBetween(src_,"file:///", "datahandler.js");
 loadJS(jsPath_ + "GetGlobal.js", true);
 loadJS(jsPath_ + "Basis.js", true);   
 
+//parameters 
+var dataRaw_ = Object.assign(data01);  var var_data =  flattenData(dataRaw_);
+var datahandler_divs = document.getElementsByClassName("datahandler-root");
+var var_divs_inner = [];  
+var var_divs_Info = [];
+
+
 //on window load:
 function main_datahandler() {
     /**
      * main function that needs to be loader on windows load
      */
+     var_divs_inner = RetInnerHTML(datahandler_divs);
+     var_divs_Info = GetPageInfo(datahandler_divs);
+     DelInnerHTML(datahandler_divs);
+     DelInfoContent(var_divs_inner);
+
     for (j = 0; j < datahandler_divs.length; j++) {
         ReplaceDivContent(j, datahandler_divs[j], var_data);}
 }
 
-function RetInnerHTML() {
-    ret = [];
-    for (i = 0; i < datahandler_divs.length; i++) {
-        ret[i] = datahandler_divs[i].innerHTML;
-    }
-    return ret;
-}
 
-function DelInnerHTML() {
-    for (i = 0; i < datahandler_divs.length; i++) {
-        datahandler_divs[i].innerHTML = "";
-    }
-}
 
 function RetStringBetween(text, fromStr, toStr ) {
     /**
@@ -86,7 +82,7 @@ function ReplaceDivContent(nth_div, _div, dataF) {
     var div_tags = getTagsfromClass(_div.classList);
     var dataF_valid = RetValidData(dataF, div_tags);
     var LoadSize = getLoadSize(_div.classList,dataF_valid.length);
-    var DivInfo = GetPageInfo(nth_div, _div);
+    var DivInfo = var_divs_Info[nth_div];
     var fragment = ''; var i;
     
     var sum = 0; // optional, if sum shall be counted
@@ -151,36 +147,52 @@ function RetValidData(_data, div_tags) {
     return dataF_valid;
 };
 
-function GetPageInfo(j, div) {
+function GetPageInfo(divs) {
     /**
-    * Returns text with dataElement replacement, dependent on div classes
+    * Returns infos to each div of page as list of infos
     * 
-    * text: text that contains replacement pre- and postfix with keys that will be replaced by dataElement
-    * dataElement: data in form of a dictionary
-    * AsTable: if true, return the data in form of table colums (to be inserted in one table row)
     */
-    suminfo = {
-        "LoadedItems": 0, // Number of data items currently loaded in the div
-        "SumKey": "", // If table with sum was used, sumkey is the key that shall be summed up at the end of table
-        "SumcolStr": "", //
-        "PageInfo.Numbering": false}; 
-    text = var_divs_inner[j];
+    ret = [];
 
-    // Loadeditems
-    suminfo.LoadedItems = RetAnzahlLoadedItems(div);
-    var idx1 = text.indexOf("{Xsum:{");
-    if (idx1 > 0) {
-        var idx2 = text.indexOf("}:", fromIndex = idx1);
-        suminfo.SumKey = text.substring(idx1+7, idx2);
-        suminfo.SumcolStr = text.substring(idx2+2, idx2+4);
+    for (i=0;i<divs.length;i++) {
+        info = {
+            "Type": "List",
+            "LoadedItems": 0, // Number of data items currently loaded in the div
+            "SumKey": "", // If table with sum was used, sumkey is the key that shall be summed up at the end of table
+            "SumcolStr": "", //
+            "PageInfo.Numbering": false}; 
+        // Type
+        if (divs[i].classList.contains("dh-table")) {
+            info.Type = "Table";
+        }
+        // Number Loaded Items
+        info.LoadedItems = RetAnzahlLoadedItems(divs[i]);
+        
+        // Numbering of items
+        if (var_divs_inner[i].includes("{num}")) {
+            info.Numbering = true;}
+
+        // Table Specific
+        if (info.Type == "Table") {
+            var idx1 = var_divs_inner[i].indexOf("{Xsum:{");
+            if (idx1 > 0) {
+                var idx2 = var_divs_inner[i].indexOf("}:", fromIndex = idx1);
+                info.SumKey = var_divs_inner[i].substring(idx1+7, idx2);
+                info.SumcolStr = var_divs_inner[i].substring(idx2+2, idx2+4);}
+        }
+        ret.push(info); 
     }
-
-    if (text.includes("{num}")) {
-        suminfo.Numbering = true;}
-    // delete
-    div.innerHTML = div.innerHTML.replace(new RegExp("{Xsum:{"+suminfo.SumKey+"}"+":"+suminfo.SumcolStr+"}", 'g'), "")
-    return suminfo;
+    return ret;
 };
+
+function DelInfoContent(divs) { // divs is global and technically not needed. parameter for better readability where sth is deleted
+    // Delete Info specificcontent
+    for (i=0;i<divs.length;i++) {
+        if (var_divs_Info[i].Type == "Table") {
+            divs[i] = divs[i].replace(new RegExp("{Xsum:{"+var_divs_Info[i].SumKey+"}"+":"+var_divs_Info[i].SumcolStr+"}", 'g'), "");}
+        }
+    a=1;
+}
 
 function RetTextReplacedWithData (divInner, div, dataElement, numbering) {
     /**

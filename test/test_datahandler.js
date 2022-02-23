@@ -1,7 +1,7 @@
 //*******************************************************/
 //TEST                                                  *
 //*******************************************************
-
+//var datahandler_divs = document.getElementsByClassName("datahandler-root");
 div_elementJ = document.getElementById("test result js");
 
 function test_passed(fname) {
@@ -13,11 +13,9 @@ function test_failed(fname) {
 }
 
 function test_GetPageInfo() {
-    pseudoDiv = {};
-    pseudoDiv.innerHTML = '{row} {col} <a href="{{url}}">{{name}}</a> {/col} {col} {{value}} {/col} {/row} {Xsum:{value}:03}'
-    test_info = {colStr: "03", key: "value"};
-    info = GetPageInfo(pseudoDiv);
-    if (test_info.colStr == info.SumcolStr && test_info.key == info.SumKey) {
+    info = GetPageInfo(datahandler_divs)
+
+    if (info.length == 2) {
         test_passed(arguments.callee.name)} 
     else {
         test_failed(arguments.callee.name)}
@@ -142,6 +140,7 @@ function test_flattenData() {
     else {
         test_failed(arguments.callee.name)}         
 }
+
 
 test_GetPageInfo(); 
 test_ReturnSubsetWithPrefix(); 
