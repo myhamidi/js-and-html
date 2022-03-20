@@ -16,6 +16,7 @@
 var scripts_ = document.getElementsByTagName("script");
 var src_ = scripts_[scripts_.length-1].src;
 var jsPath_ = RetStringBetween(src_,"file:///", "datahandler.js");
+console.log(jsPath_ + "datahandler.js" + " loaded")
 loadJS(jsPath_ + "GetGlobal.js", true);
 loadJS(jsPath_ + "Basis.js", true);   
 
@@ -65,11 +66,11 @@ function loadJS(FILE_URL, async = true) {
   
     // success event 
     scriptEle.addEventListener("load", () => {
-      console.log("File loaded")
+      console.log(FILE_URL + " loaded")
     });
      // error event
     scriptEle.addEventListener("error", (ev) => {
-      console.log("Error on loading file", ev);
+      console.log("Error on loading file " + FILE_URL, ev);
     });
   }
 
