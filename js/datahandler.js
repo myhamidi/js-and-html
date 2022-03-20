@@ -17,8 +17,8 @@ var scripts_ = document.getElementsByTagName("script");
 var src_ = scripts_[scripts_.length-1].src;
 var jsPath_ = X1_RetStringBetween(src_,"file:///", "datahandler.js");
 console.log(jsPath_ + "datahandler.js" + " loaded")
-X2_loadJS(jsPath_ + "GetGlobal.js", true);
-X2_loadJS(jsPath_ + "Basis.js", true);   
+X2_loadJS(jsPath_ + "dh-main.js", true);
+X2_loadJS(jsPath_ + "dh-basis.js", true);   
 
 //parameters 
 var dataRaw_ = Object.assign(data01);  var var_data =  X3_flattenData(dataRaw_);
