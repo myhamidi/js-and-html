@@ -26,23 +26,6 @@ var datahandler_divs = document.getElementsByClassName("datahandler-root");
 var var_divs_inner = [];  
 var var_divs_Info = [];
 
-
-//on window load:
-function main_datahandler() {
-    /**
-     * main function that needs to be loader on windows load
-     */
-     var_divs_inner = RetInnerHTML(datahandler_divs);
-     var_divs_Info = GetPageInfo(datahandler_divs);
-     DelInnerHTML(datahandler_divs);
-     DelInfoContent(var_divs_inner);
-
-    for (j = 0; j < datahandler_divs.length; j++) {
-        ReplaceDivContent(j, datahandler_divs[j], var_data);}
-}
-
-
-
 function RetStringBetween(text, fromStr, toStr ) {
     /**
      * Returns the String between two  strings.
@@ -74,6 +57,22 @@ function loadJS(FILE_URL, async = true) {
     });
   }
 
+
+//on window load:
+function main_datahandler() {
+    /**
+     * main function that needs to be loader on windows load
+     */
+     var_divs_inner = RetInnerHTML(datahandler_divs);
+     var_divs_Info = GetPageInfo(datahandler_divs);
+     DelInnerHTML(datahandler_divs);
+     DelInfoContent(var_divs_inner);
+
+    for (j = 0; j < datahandler_divs.length; j++) {
+        ReplaceDivContent(j, datahandler_divs[j], var_data);}
+}
+
+
 function ReplaceDivContent(nth_div, _div, dataF) {
     /**
      * Replaces div element with data array based on the tags defined in the html div. 
@@ -96,23 +95,28 @@ function ReplaceDivContent(nth_div, _div, dataF) {
         if (DivInfo.SumKey != "") {
             sum += dataF_valid[i][DivInfo.SumKey]}
         fragment += RetTextReplacedWithData(var_divs_inner[nth_div], _div,dataF_valid[i],nthCall)}
-
+    
+    // Add Sum Row (optional)   
     if (DivInfo.SumKey != "") {
         num_cols = var_divs_inner[nth_div].split("{col}").length - 1;
         insert_col = parseInt(DivInfo.SumcolStr)-1; // repeat n-1 times
         fragment += "<tr>" + "<td></td>".repeat(insert_col) + "<td><b>" + sum + "</b></td>" + "<td></td>".repeat(num_cols - insert_col - 1) + "</tr>" 
     }
     
+    // Add Button (optional)
     if (dataF_valid.length>ubound) {
-        fragment += "<br>" + RetStringHTMLButton("Next (Showing " + String(ubound) + " of " + String(dataF_valid.length) + ")", "myFunction", _div.id);
-        fragment += ReturnAsComment("Loaded Items:" + String(ubound) + "!")    
+        fragment += "<br>" + RetStringHTMLButton("Next (Showing " + String(ubound) + " of " + String(dataF_valid.length) + ")", "myFunction", _div.id); 
     }
 
+    // Make table Klammer (optional)
     if (_div.classList.contains("dh-table")) {
-        _div.innerHTML  = "<table>" + fragment + "</table>";}
-    else {
-        _div.innerHTML = fragment;}
+        fragment  = "<table>" + fragment + "</table>";}
     
+    // Add comment with number loaded itmes
+    fragment += ReturnAsComment("Loaded Items:" + String(ubound) + "!")
+
+    // Apply to div
+    _div.innerHTML = fragment;
 };
 
 
