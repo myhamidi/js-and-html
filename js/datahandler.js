@@ -23,8 +23,8 @@ loadJS(jsPath_ + "Basis.js", true);
 //parameters 
 var dataRaw_ = Object.assign(data01);  var var_data =  flattenData(dataRaw_);
 var datahandler_divs = document.getElementsByClassName("datahandler-root");
-var var_divs_inner = [];  
-var var_divs_Info = [];
+var var_divs_inner = RetInnerHTML(datahandler_divs);
+var var_divs_Info = []; // to be updated after every reload
 
 function RetStringBetween(text, fromStr, toStr ) {
     /**
@@ -57,13 +57,24 @@ function loadJS(FILE_URL, async = true) {
     });
   }
 
+function RetInnerHTML(divs) {
+    /**
+    * Returns the InnerHTML of the divs. divs must be an HTML Colletion
+    * 
+    */  
+
+   ret = [];
+   for (i = 0; i < divs.length; i++) {
+       ret[i] = divs[i].innerHTML;
+   }
+   return ret;
+}
 
 //on window load:
 function main_datahandler() {
     /**
      * main function that needs to be loader on windows load
      */
-     var_divs_inner = RetInnerHTML(datahandler_divs);
      var_divs_Info = GetPageInfo(datahandler_divs);
      DelInnerHTML(datahandler_divs);
      DelInfoContent(var_divs_inner);
